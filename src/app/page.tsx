@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth/auth";
 import { Button } from "@/components/ui/button";
-import { Sparkles, PenLine, Gauge, Wand2, Globe, Smartphone } from "lucide-react";
+import { MarketingNav } from "@/components/marketing/marketing-nav";
+import { BrowserMockup } from "@/components/marketing/browser-mockup";
+import { Sparkles, PenLine, Gauge, Wand2, Globe, Smartphone, ArrowRight } from "lucide-react";
 
 const steps = [
   { n: "1", title: "Produit", body: "Décris ce que tu vends, à qui, et colle ton lien de paiement." },
@@ -27,46 +29,75 @@ export default async function HomePage() {
 
   return (
     <main className="flex-1 bg-white">
-      <section className="relative overflow-hidden bg-gradient-to-br from-indigo-700 via-indigo-600 to-violet-600 px-6 py-24 text-center sm:py-32">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(251,191,36,0.25),transparent_55%)]" />
-        <div className="relative mx-auto max-w-2xl">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-indigo-100 ring-1 ring-white/20">
-            <Sparkles className="h-3.5 w-3.5" />
-            Propulsé par l&apos;IA
-          </span>
-          <h1 className="mt-5 text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-            Transforme ton offre en page de vente premium, en un après-midi.
-          </h1>
-          <p className="mt-4 text-base text-indigo-100 sm:text-xl">
-            OfferLab reformule ta promesse, écrit ton copywriting, assemble ta page et te dit
-            précisément ce qui freine la conversion — pour les vendeurs de formations, ebooks,
-            coaching et communautés payantes.
-          </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href={primaryHref}>
-              <Button variant="accent" size="lg">
-                {session?.user ? "Accéder à mon dashboard" : "Créer mon compte gratuitement"}
-              </Button>
-            </Link>
-            {!session?.user && (
-              <Link href="/login" className="text-sm font-medium text-indigo-100 underline underline-offset-4">
-                Se connecter
-              </Link>
-            )}
+      <section className="relative overflow-hidden bg-gray-950 px-6 pb-20 pt-32 sm:pb-28 sm:pt-40">
+        <MarketingNav isAuthenticated={Boolean(session?.user)} />
+
+        {/* Décor : voile mesh-gradient + grille + halos flous */}
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,#1e1b4b_0%,#312e81_30%,#4c1d95_55%,#1e1b4b_100%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,black,transparent)]" />
+        <div className="pointer-events-none absolute -top-24 right-[-10%] h-96 w-96 rounded-full bg-amber-400/30 blur-[100px]" />
+        <div className="pointer-events-none absolute -bottom-32 left-[-10%] h-96 w-96 rounded-full bg-fuchsia-500/20 blur-[110px]" />
+
+        <div className="relative mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-8">
+          <div className="text-center lg:text-left">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-indigo-100 ring-1 ring-white/20 backdrop-blur">
+              <Sparkles className="h-3.5 w-3.5 text-amber-300" />
+              Propulsé par l&apos;IA
+            </span>
+            <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Transforme ton offre en{" "}
+              <span className="bg-gradient-to-r from-amber-300 to-orange-300 bg-clip-text text-transparent">
+                page de vente premium
+              </span>
+              , en un après-midi.
+            </h1>
+            <p className="mx-auto mt-5 max-w-xl text-base text-indigo-100/80 sm:text-lg lg:mx-0">
+              OfferLab reformule ta promesse, écrit ton copywriting, assemble ta page et te dit
+              précisément ce qui freine la conversion — pour les vendeurs de formations, ebooks,
+              coaching et communautés payantes.
+            </p>
+            <div className="mt-8 flex flex-col items-center gap-4 lg:items-start">
+              <div className="flex flex-col items-center gap-3 sm:flex-row">
+                <Link href={primaryHref}>
+                  <Button variant="accent" size="lg" className="gap-2">
+                    {session?.user ? "Accéder à mon dashboard" : "Créer mon compte gratuitement"}
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+                {!session?.user && (
+                  <Link href="/login" className="text-sm font-medium text-indigo-100 underline underline-offset-4 hover:text-white">
+                    Se connecter
+                  </Link>
+                )}
+              </div>
+              <p className="text-xs text-indigo-200/60">
+                Aucune carte bancaire requise · Positionnement, copy et design générés par l&apos;IA
+              </p>
+            </div>
+          </div>
+
+          <div className="[perspective:1200px]">
+            <div className="[transform:rotateY(-6deg)_rotateX(2deg)]">
+              <BrowserMockup />
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="bg-gray-50 px-6 py-16 sm:py-20">
+      <section id="comment-ca-marche" className="bg-gray-50 px-6 py-16 sm:py-24">
         <div className="mx-auto max-w-4xl">
-          <h2 className="text-center text-2xl font-semibold sm:text-3xl">Comment ça marche</h2>
+          <p className="text-center text-sm font-semibold uppercase tracking-wide text-indigo-600">Le parcours</p>
+          <h2 className="mt-2 text-center text-2xl font-semibold sm:text-3xl">Comment ça marche</h2>
           <div className="mt-10 grid gap-4 sm:grid-cols-3">
             {steps.map((step) => (
-              <div key={step.n} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white">
+              <div
+                key={step.n}
+                className="group rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:border-indigo-200 hover:shadow-lg"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white shadow-sm shadow-indigo-600/30">
                   {step.n}
                 </span>
-                <p className="mt-3 font-semibold">{step.title}</p>
+                <p className="mt-4 font-semibold">{step.title}</p>
                 <p className="mt-1 text-sm text-gray-500">{step.body}</p>
               </div>
             ))}
@@ -74,16 +105,20 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="px-6 py-16 sm:py-20">
+      <section id="fonctionnalites" className="px-6 py-16 sm:py-24">
         <div className="mx-auto max-w-4xl">
-          <h2 className="text-center text-2xl font-semibold sm:text-3xl">Ce que tu obtiens</h2>
+          <p className="text-center text-sm font-semibold uppercase tracking-wide text-indigo-600">La boîte à outils</p>
+          <h2 className="mt-2 text-center text-2xl font-semibold sm:text-3xl">Ce que tu obtiens</h2>
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
             {features.map((feature) => (
-              <div key={feature.title} className="rounded-xl border border-gray-200 p-5 transition-colors hover:border-indigo-200 hover:bg-indigo-50/40">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 text-indigo-700">
+              <div
+                key={feature.title}
+                className="group rounded-2xl border border-gray-200 p-5 transition-all hover:-translate-y-1 hover:border-indigo-200 hover:shadow-lg"
+              >
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
                   <feature.icon className="h-5 w-5" />
                 </div>
-                <p className="mt-3 font-semibold">{feature.title}</p>
+                <p className="mt-4 font-semibold">{feature.title}</p>
                 <p className="mt-1 text-sm text-gray-500">{feature.body}</p>
               </div>
             ))}
@@ -91,18 +126,28 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-gradient-to-br from-indigo-700 to-violet-700 px-6 py-16 text-center sm:py-20">
+      <section className="relative overflow-hidden bg-gray-950 px-6 py-20 text-center sm:py-28">
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,#1e1b4b_0%,#312e81_40%,#4c1d95_100%)]" />
+        <div className="pointer-events-none absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 rounded-full bg-amber-400/25 blur-[100px]" />
         <div className="relative mx-auto max-w-xl">
-          <p className="text-xl font-semibold text-white sm:text-2xl">
+          <p className="text-2xl font-semibold text-white sm:text-3xl">
             Prêt à transformer ton offre ?
           </p>
-          <Link href={primaryHref} className="mt-6 inline-block">
-            <Button variant="accent" size="lg">
+          <p className="mt-3 text-indigo-100/80">
+            Crée ton compte et génère ta première page de vente aujourd&apos;hui.
+          </p>
+          <Link href={primaryHref} className="mt-7 inline-block">
+            <Button variant="accent" size="lg" className="gap-2">
               {session?.user ? "Accéder à mon dashboard" : "Créer mon compte gratuitement"}
+              <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
         </div>
       </section>
+
+      <footer className="border-t border-gray-100 bg-white px-6 py-8 text-center text-sm text-gray-400">
+        © {new Date().getFullYear()} OfferLab. Fait pour les vendeurs de produits digitaux.
+      </footer>
     </main>
   );
 }
