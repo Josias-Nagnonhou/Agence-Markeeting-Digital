@@ -8,6 +8,7 @@ import {
   findTemplateById,
   updatePageTemplate,
   findPageBySlug,
+  listPagesForUser,
 } from "@/modules/page-builder/page.repository";
 
 export class PageNotFoundError extends Error {
@@ -77,6 +78,10 @@ export async function selectTemplateForPage(userId: string, pageId: string, temp
 export async function getExistingPageForProduct(userId: string, productId: string) {
   await getOwnedProduct(userId, productId);
   return findPageByProductId(productId);
+}
+
+export function getPagesForUser(userId: string) {
+  return listPagesForUser(userId);
 }
 
 /**

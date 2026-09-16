@@ -60,6 +60,14 @@ export function updatePageTemplate(pageId: string, templateId: string) {
   });
 }
 
+export function listPagesForUser(userId: string) {
+  return prisma.page.findMany({
+    where: { product: { userId } },
+    select: { id: true, title: true, slug: true, product: { select: { name: true } } },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
 export function findPageBySlug(slug: string) {
   return prisma.page.findUnique({
     where: { slug },
