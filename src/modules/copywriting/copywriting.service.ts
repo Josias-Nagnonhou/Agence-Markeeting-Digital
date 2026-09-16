@@ -1,5 +1,5 @@
 import { callAiJson } from "@/lib/ai/ai-client";
-import { fetchStockPhotoUrl } from "@/lib/images/stock-photo-client";
+import { generateHeroImageUrl } from "@/lib/images/hero-image-generator";
 import { COPYWRITING_SYSTEM_PROMPT, buildCopywritingPrompt } from "@/lib/ai/prompts/copywriting";
 import {
   buildSectionRetouchSystemPrompt,
@@ -54,7 +54,8 @@ export async function generateCopyForProduct(userId: string, productId: string) 
   const sections = await replaceSections(page.id, toSectionRecords(copy));
 
   if (!page.ogImageUrl) {
-    const heroImageUrl = product.images[0]?.url ?? (await fetchStockPhotoUrl(product.category));
+    const heroImageUrl =
+      product.images[0]?.url ?? (await generateHeroImageUrl(product.category, product.name));
     if (heroImageUrl) await setPageHeroImage(page.id, heroImageUrl);
   }
 

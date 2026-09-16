@@ -26,3 +26,17 @@ export async function uploadProductImage(file: File) {
   const provider = getStorageProvider();
   return provider.upload(file, "products");
 }
+
+/**
+ * Sauvegarde une image générée côté serveur (visuel IA du hero) via le
+ * même provider que les uploads produit, pour éviter de stocker un long
+ * data URL en base.
+ */
+export async function uploadGeneratedImage(base64Data: string, mimeType: string) {
+  const buffer = Buffer.from(base64Data, "base64");
+  const extension = mimeType.split("/")[1] ?? "png";
+  const file = new File([buffer], `generated.${extension}`, { type: mimeType });
+
+  const provider = getStorageProvider();
+  return provider.upload(file, "generated");
+}
