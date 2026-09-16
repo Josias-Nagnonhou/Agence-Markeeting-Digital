@@ -180,7 +180,7 @@ model OfferAngle {
 
 model Template {
   id              String           @id @default(cuid())
-  name            String
+  name            String           @unique
   niche           ProductCategory?
   description     String?
   previewImageUrl String?

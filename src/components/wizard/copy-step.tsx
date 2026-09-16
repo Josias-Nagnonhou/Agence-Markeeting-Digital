@@ -86,7 +86,7 @@ export function CopyStep({
         <Button variant="secondary" onClick={handleGenerate} isLoading={isGenerating}>
           Tout régénérer
         </Button>
-        <Button onClick={() => router.push(`/dashboard/products/${productId}`)}>
+        <Button onClick={() => router.push(`/dashboard/products/${productId}/design`)}>
           Continuer vers le design
         </Button>
       </div>

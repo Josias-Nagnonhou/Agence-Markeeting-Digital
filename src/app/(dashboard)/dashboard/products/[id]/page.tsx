@@ -24,20 +24,18 @@ export default async function ProductDetailPage({
     product.category;
 
   const selectedAngle = product.offerAngles.find((angle) => angle.status === "SELECTED");
-  const { sections } = await getCopyForProduct(session!.user.id, id);
+  const { page, sections } = await getCopyForProduct(session!.user.id, id);
   const headline = sections.find((section) => section.type === "HEADLINE")?.content as
     | { text: string }
     | undefined;
+  const hasCopy = sections.length > 0;
+  const hasTemplate = Boolean(page?.templateId);
 
   const steps: WizardStep[] = [
     { key: "product", label: "Produit", status: "done" },
     { key: "offer", label: "Offre", status: selectedAngle ? "done" : "current" },
-    {
-      key: "copy",
-      label: "Copy",
-      status: sections.length > 0 ? "done" : selectedAngle ? "current" : "upcoming",
-    },
-    { key: "design", label: "Design", status: "upcoming" },
+    { key: "copy", label: "Copy", status: hasCopy ? "done" : selectedAngle ? "current" : "upcoming" },
+    { key: "design", label: "Design", status: hasTemplate ? "done" : hasCopy ? "current" : "upcoming" },
     { key: "checkout", label: "Checkout", status: "upcoming" },
     { key: "publish", label: "Publication", status: "upcoming" },
   ];
@@ -126,7 +124,7 @@ export default async function ProductDetailPage({
             <div className="flex items-center justify-between">
               <h2 className="font-semibold">Copywriting</h2>
               <Link href={`/dashboard/products/${product.id}/copy`} className="text-xs font-medium text-gray-500 underline">
-                {sections.length > 0 ? "Modifier" : "Générer"}
+                {hasCopy ? "Modifier" : "Générer"}
               </Link>
             </div>
             {headline ? (
@@ -138,6 +136,26 @@ export default async function ProductDetailPage({
                 Le copy n&apos;a pas encore été généré pour cette page.
               </p>
             )}
+          </Card>
+        )}
+
+        {hasCopy && (
+          <Card className="flex flex-col gap-3 bg-gray-50 md:col-span-2">
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold">Design</h2>
+              <Link href={`/dashboard/products/${product.id}/design`} className="text-xs font-medium text-gray-500 underline">
+                {hasTemplate ? "Modifier" : "Choisir une direction visuelle"}
+              </Link>
+            </div>
+            <p className="text-sm text-gray-600">
+              {hasTemplate ? (
+                <>
+                  Direction visuelle : <span className="font-medium text-gray-900">{page?.template?.name}</span>
+                </>
+              ) : (
+                "Choisis une direction visuelle et prévisualise ta page de vente."
+              )}
+            </p>
           </Card>
         )}
       </div>

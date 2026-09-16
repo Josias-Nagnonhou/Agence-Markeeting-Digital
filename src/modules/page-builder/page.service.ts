@@ -4,6 +4,9 @@ import {
   findPageOwnedByUser,
   createDraftPage,
   updatePageOfferAngle,
+  listTemplates,
+  findTemplateById,
+  updatePageTemplate,
 } from "@/modules/page-builder/page.repository";
 
 export class PageNotFoundError extends Error {
@@ -15,6 +18,12 @@ export class PageNotFoundError extends Error {
 export class NoSelectedOfferAngleError extends Error {
   constructor() {
     super("Choisis d'abord un angle d'offre avant de générer le copywriting.");
+  }
+}
+
+export class TemplateNotFoundError extends Error {
+  constructor() {
+    super("Direction visuelle introuvable.");
   }
 }
 
@@ -43,8 +52,21 @@ export async function getOrCreateDraftPageForProduct(userId: string, productId: 
     return { page: existingPage, product, selectedAngle };
   }
 
-  const page = await createDraftPage(productId, product.name, selectedAngle.id);
+  const [defaultTemplate] = await listTemplates();
+  const page = await createDraftPage(productId, product.name, selectedAngle.id, defaultTemplate?.id);
   return { page, product, selectedAngle };
+}
+
+export async function getAvailableTemplates() {
+  return listTemplates();
+}
+
+export async function selectTemplateForPage(userId: string, pageId: string, templateId: string) {
+  await getOwnedPage(userId, pageId);
+  const template = await findTemplateById(templateId);
+  if (!template) throw new TemplateNotFoundError();
+
+  return updatePageTemplate(pageId, templateId);
 }
 
 /**
