@@ -9,6 +9,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label, FieldError } from "@/components/ui/label";
+import { GoogleSignInButton } from "@/components/auth/google-signin-button";
 
 const loginSchema = z.object({
   email: z.string().email("Adresse e-mail invalide."),
@@ -39,9 +40,18 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
       <h1 className="text-lg font-semibold">Connexion</h1>
 
+      <GoogleSignInButton />
+
+      <div className="flex items-center gap-3 text-xs text-gray-400">
+        <span className="h-px flex-1 bg-gray-200" />
+        ou
+        <span className="h-px flex-1 bg-gray-200" />
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
         <Label htmlFor="email">E-mail</Label>
         <Input id="email" type="email" placeholder="vous@exemple.com" {...register("email")} />
@@ -59,13 +69,14 @@ export function LoginForm() {
       <Button type="submit" className="w-full" isLoading={isSubmitting}>
         Se connecter
       </Button>
+      </form>
 
       <p className="text-center text-sm text-gray-500">
         Pas encore de compte ?{" "}
-        <a href="/register" className="font-medium text-gray-900 underline">
+        <a href="/register" className="font-medium text-indigo-700 underline">
           Créer un compte
         </a>
       </p>
-    </form>
+    </div>
   );
 }

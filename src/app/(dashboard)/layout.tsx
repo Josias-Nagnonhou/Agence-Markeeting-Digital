@@ -13,17 +13,17 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <header className="border-b border-gray-200 bg-white">
           <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
             <div className="flex items-center gap-6">
-              <Link href="/dashboard" className="text-lg font-semibold tracking-tight">
+              <Link href="/dashboard" className="text-lg font-semibold tracking-tight text-indigo-700">
                 OfferLab
               </Link>
               <nav className="flex items-center gap-4 text-sm text-gray-600">
-                <Link href="/dashboard" className="hover:text-gray-900">
+                <Link href="/dashboard" className="hover:text-indigo-700">
                   Mes produits
                 </Link>
-                <Link href="/dashboard/diagnostic" className="hover:text-gray-900">
+                <Link href="/dashboard/diagnostic" className="hover:text-indigo-700">
                   Diagnostic
                 </Link>
-                <Link href="/dashboard/billing" className="hover:text-gray-900">
+                <Link href="/dashboard/billing" className="hover:text-indigo-700">
                   Facturation
                 </Link>
               </nav>

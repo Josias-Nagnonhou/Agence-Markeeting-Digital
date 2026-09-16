@@ -9,6 +9,7 @@ import { registerInputSchema, type RegisterInput } from "@/modules/auth/auth.typ
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label, FieldError } from "@/components/ui/label";
+import { GoogleSignInButton } from "@/components/auth/google-signin-button";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -50,9 +51,18 @@ export function RegisterForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
       <h1 className="text-lg font-semibold">Créer un compte</h1>
 
+      <GoogleSignInButton />
+
+      <div className="flex items-center gap-3 text-xs text-gray-400">
+        <span className="h-px flex-1 bg-gray-200" />
+        ou
+        <span className="h-px flex-1 bg-gray-200" />
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
         <Label htmlFor="name">Nom</Label>
         <Input id="name" placeholder="Aïcha Koné" {...register("name")} />
@@ -76,13 +86,14 @@ export function RegisterForm() {
       <Button type="submit" className="w-full" isLoading={isSubmitting}>
         Créer mon compte
       </Button>
+      </form>
 
       <p className="text-center text-sm text-gray-500">
         Déjà inscrit ?{" "}
-        <a href="/login" className="font-medium text-gray-900 underline">
+        <a href="/login" className="font-medium text-indigo-700 underline">
           Se connecter
         </a>
       </p>
-    </form>
+    </div>
   );
 }
