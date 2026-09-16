@@ -1,0 +1,625 @@
+// Schema Prisma — OfferLab
+// Convention : les modules MVP sont complets, les modules V2/V3 sont posés
+// en amont (schéma minimal) pour permettre d'ajouter le module applicatif
+// correspondant sans migration structurante plus tard.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Auth (compatible Auth.js / NextAuth PrismaAdapter)
+// ---------------------------------------------------------------------------
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  passwordHash  String?
+  image         String?
+  role          UserRole  @default(USER)
+  creditBalance Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  products      Product[]
+  orders        Order[]
+  creditEntries CreditLedgerEntry[]
+  diagnostics   Diagnostic[]
+  affiliates    Affiliate[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ---------------------------------------------------------------------------
+// 1.1 — Produit (onboarding)
+// ---------------------------------------------------------------------------
+
+enum ProductCategory {
+  FORMATION
+  EBOOK
+  COACHING
+  TEMPLATE
+  COMMUNAUTE
+  SAAS
+  SERVICE
+  AUTRE
+}
+
+enum PaymentProvider {
+  CHARIOW
+  GENERIC_LINK
+  STRIPE
+  KKIAPAY
+  FEDAPAY
+  PAYDUNYA
+}
+
+model Product {
+  id              String          @id @default(cuid())
+  userId          String
+  name            String
+  category        ProductCategory @default(AUTRE)
+  targetAudience  String
+  problemSolved   String
+  price           Decimal         @db.Decimal(12, 2)
+  currency        String          @default("XOF")
+  paymentProvider PaymentProvider @default(GENERIC_LINK)
+  paymentLinkUrl  String
+  images          ProductImage[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  offerAngles  OfferAngle[]
+  pages        Page[]
+  testimonials Testimonial[]
+  orderBumps   OrderBump[]
+
+  @@index([userId])
+  @@map("products")
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  url       String
+  alt       String?
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_images")
+}
+
+// ---------------------------------------------------------------------------
+// 1.2 — Moteur IA de positionnement d'offre
+// ---------------------------------------------------------------------------
+
+enum OfferAngleStatus {
+  PROPOSED
+  SELECTED
+  DISCARDED
+}
+
+model OfferAngle {
+  id             String           @id @default(cuid())
+  productId      String
+  status         OfferAngleStatus @default(PROPOSED)
+  promise        String
+  differentiator String
+  benefits       String[]
+  rationale      String?
+  createdAt      DateTime         @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  pages   Page[]
+
+  @@index([productId])
+  @@map("offer_angles")
+}
+
+// ---------------------------------------------------------------------------
+// 1.4 / 2.1 — Templates de landing page
+// ---------------------------------------------------------------------------
+
+model Template {
+  id              String           @id @default(cuid())
+  name            String
+  niche           ProductCategory?
+  description     String?
+  previewImageUrl String?
+  structure       Json
+  isPremium       Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+
+  pages Page[]
+
+  @@map("templates")
+}
+
+// ---------------------------------------------------------------------------
+// 1.3 / 1.4 / 1.5 / 1.8 / 2.9 / 2.10 — Page de vente générée
+// ---------------------------------------------------------------------------
+
+enum PageStatus {
+  DRAFT
+  PUBLISHED
+  PAUSED
+}
+
+enum Locale {
+  FR
+  EN
+}
+
+model Page {
+  id           String     @id @default(cuid())
+  productId    String
+  offerAngleId String?
+  templateId   String?
+  slug         String     @unique
+  title        String
+  status       PageStatus @default(DRAFT)
+  locale       Locale     @default(FR)
+  isPrimary    Boolean    @default(true)
+
+  // 2.9 — SEO & partage
+  seoTitle       String?
+  seoDescription String?
+  ogImageUrl     String?
+
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  offerAngle OfferAngle? @relation(fields: [offerAngleId], references: [id])
+  template   Template?   @relation(fields: [templateId], references: [id])
+
+  sections        PageSection[]
+  versions        PageVersion[]
+  diagnostics     Diagnostic[]
+  subscription    HostingSubscription?
+  leads           Lead[]
+  analyticsEvents AnalyticsEvent[]
+  abTests         ABTest[]
+  affiliates      Affiliate[]
+
+  @@index([productId])
+  @@map("pages")
+}
+
+enum SectionType {
+  HEADLINE
+  SUBHEADLINE
+  PROBLEM_AGITATION
+  BENEFITS
+  SOCIAL_PROOF
+  OBJECTIONS
+  GUARANTEE
+  PRICING
+  FAQ
+  CTA
+  CUSTOM
+}
+
+model PageSection {
+  id        String      @id @default(cuid())
+  pageId    String
+  type      SectionType
+  position  Int         @default(0)
+  content   Json
+  isVisible Boolean     @default(true)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@index([pageId])
+  @@map("page_sections")
+}
+
+model PageVersion {
+  id        String   @id @default(cuid())
+  pageId    String
+  label     String?
+  snapshot  Json
+  createdAt DateTime @default(now())
+
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@index([pageId])
+  @@map("page_versions")
+}
+
+// ---------------------------------------------------------------------------
+// 1.6 — Diagnostic CRO
+// ---------------------------------------------------------------------------
+
+enum DiagnosticTargetType {
+  INTERNAL_PAGE
+  EXTERNAL_URL
+}
+
+enum DiagnosticCategory {
+  CLARITY
+  TRUST
+  DESIRE
+  FRICTION
+  SEO
+}
+
+enum DiagnosticSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model Diagnostic {
+  id          String               @id @default(cuid())
+  userId      String
+  targetType  DiagnosticTargetType
+  pageId      String?
+  externalUrl String?
+  score       Int?
+  summary     String?
+  createdAt   DateTime             @default(now())
+
+  user     User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  page     Page?               @relation(fields: [pageId], references: [id])
+  findings DiagnosticFinding[]
+
+  @@index([userId])
+  @@index([pageId])
+  @@map("diagnostics")
+}
+
+model DiagnosticFinding {
+  id             String             @id @default(cuid())
+  diagnosticId   String
+  category       DiagnosticCategory
+  severity       DiagnosticSeverity
+  title          String
+  recommendation String
+  position       Int                @default(0)
+
+  diagnostic Diagnostic @relation(fields: [diagnosticId], references: [id], onDelete: Cascade)
+
+  @@index([diagnosticId])
+  @@map("diagnostic_findings")
+}
+
+// ---------------------------------------------------------------------------
+// 1.7 — Crédits de retouches IA
+// ---------------------------------------------------------------------------
+
+enum CreditTransactionType {
+  GRANT
+  PURCHASE
+  CONSUME
+  REFUND
+}
+
+enum CreditReason {
+  SECTION_REGENERATION
+  TONE_ADJUSTMENT
+  LENGTH_ADJUSTMENT
+  FULL_REGENERATION
+  OFFER_ANGLE_REGENERATION
+  DIAGNOSTIC
+  SIGNUP_BONUS
+  OTHER
+}
+
+model CreditLedgerEntry {
+  id        String                @id @default(cuid())
+  userId    String
+  type      CreditTransactionType
+  reason    CreditReason
+  amount    Int
+  metadata  Json?
+  createdAt DateTime              @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("credit_ledger_entries")
+}
+
+// ---------------------------------------------------------------------------
+// 1.8 / 1.9 — Hébergement & facturation de l'app
+// ---------------------------------------------------------------------------
+
+enum OrderType {
+  PAGE_CREATION
+  CREDIT_PACK
+  ADDON
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum BillingProvider {
+  STRIPE
+  KKIAPAY
+  FEDAPAY
+  PAYDUNYA
+}
+
+model Order {
+  id          String          @id @default(cuid())
+  userId      String
+  pageId      String?
+  type        OrderType
+  status      OrderStatus     @default(PENDING)
+  amount      Decimal         @db.Decimal(12, 2)
+  currency    String          @default("XOF")
+  provider    BillingProvider
+  providerRef String?
+  createdAt   DateTime        @default(now())
+  paidAt      DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("orders")
+}
+
+enum SubscriptionPlan {
+  HOSTING_BASIC
+  HOSTING_PRO
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  TRIALING
+}
+
+model HostingSubscription {
+  id               String             @id @default(cuid())
+  pageId           String             @unique
+  plan             SubscriptionPlan   @default(HOSTING_BASIC)
+  status           SubscriptionStatus @default(TRIALING)
+  provider         BillingProvider
+  providerRef      String?
+  currentPeriodEnd DateTime?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@map("hosting_subscriptions")
+}
+
+// ---------------------------------------------------------------------------
+// 2.4 — Capture d'e-mails / lead magnet
+// ---------------------------------------------------------------------------
+
+model Lead {
+  id        String   @id @default(cuid())
+  pageId    String
+  email     String
+  createdAt DateTime @default(now())
+
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@index([pageId])
+  @@map("leads")
+}
+
+// ---------------------------------------------------------------------------
+// 2.3 — Analytics & tunnel de conversion
+// ---------------------------------------------------------------------------
+
+enum AnalyticsEventType {
+  PAGE_VIEW
+  SCROLL_DEPTH
+  CTA_CLICK
+  SECTION_EXIT
+  LEAD_CAPTURED
+  CHECKOUT_CLICK
+}
+
+model AnalyticsEvent {
+  id            String             @id @default(cuid())
+  pageId        String
+  sessionId     String
+  type          AnalyticsEventType
+  abTestVariant String?
+  payload       Json?
+  createdAt     DateTime           @default(now())
+
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@index([pageId, type])
+  @@map("analytics_events")
+}
+
+// ---------------------------------------------------------------------------
+// 2.2 — A/B testing
+// ---------------------------------------------------------------------------
+
+enum ABTestStatus {
+  RUNNING
+  PAUSED
+  COMPLETED
+}
+
+model ABTest {
+  id        String       @id @default(cuid())
+  pageId    String
+  name      String
+  status    ABTestStatus @default(RUNNING)
+  createdAt DateTime     @default(now())
+
+  page     Page            @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  variants ABTestVariant[]
+
+  @@index([pageId])
+  @@map("ab_tests")
+}
+
+model ABTestVariant {
+  id            String @id @default(cuid())
+  abTestId      String
+  key           String
+  trafficWeight Int    @default(50)
+  content       Json
+
+  abTest ABTest @relation(fields: [abTestId], references: [id], onDelete: Cascade)
+
+  @@index([abTestId])
+  @@map("ab_test_variants")
+}
+
+// ---------------------------------------------------------------------------
+// 2.5 — Order bump / upsell
+// ---------------------------------------------------------------------------
+
+enum OrderBumpPosition {
+  BEFORE_CHECKOUT
+  AFTER_CHECKOUT
+}
+
+model OrderBump {
+  id             String            @id @default(cuid())
+  productId      String
+  title          String
+  description    String
+  price          Decimal           @db.Decimal(12, 2)
+  paymentLinkUrl String
+  position       OrderBumpPosition @default(BEFORE_CHECKOUT)
+  isActive       Boolean           @default(true)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("order_bumps")
+}
+
+// ---------------------------------------------------------------------------
+// 2.8 — Affiliation
+// ---------------------------------------------------------------------------
+
+enum AffiliateReferralStatus {
+  PENDING
+  CONFIRMED
+  PAID
+}
+
+model Affiliate {
+  id             String   @id @default(cuid())
+  userId         String
+  pageId         String
+  code           String   @unique
+  commissionRate Decimal  @db.Decimal(5, 2)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  page      Page                @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  referrals AffiliateReferral[]
+
+  @@index([userId])
+  @@index([pageId])
+  @@map("affiliates")
+}
+
+model AffiliateReferral {
+  id          String                  @id @default(cuid())
+  affiliateId String
+  status      AffiliateReferralStatus @default(PENDING)
+  amount      Decimal?                @db.Decimal(12, 2)
+  commission  Decimal?                @db.Decimal(12, 2)
+  createdAt   DateTime                @default(now())
+  confirmedAt DateTime?
+
+  affiliate Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  @@index([affiliateId])
+  @@map("affiliate_referrals")
+}
+
+// ---------------------------------------------------------------------------
+// 2.13 — Preuves & avis
+// ---------------------------------------------------------------------------
+
+model Testimonial {
+  id         String   @id @default(cuid())
+  productId  String
+  authorName String
+  authorRole String?
+  content    String
+  rating     Int?
+  imageUrl   String?
+  isApproved Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("testimonials")
+}
