@@ -1,9 +1,16 @@
 import { callClaudeJson } from "@/lib/ai/claude-client";
 import { COPYWRITING_SYSTEM_PROMPT, buildCopywritingPrompt } from "@/lib/ai/prompts/copywriting";
 import {
+  buildSectionRetouchSystemPrompt,
+  buildSectionRetouchPrompt,
+  type RetouchTone,
+  type RetouchLength,
+} from "@/lib/ai/prompts/section-retouch";
+import {
   getOrCreateDraftPageForProduct,
   getExistingPageForProduct,
   getOwnedPage,
+  NoSelectedOfferAngleError,
 } from "@/modules/page-builder/page.service";
 import {
   generatedCopyResponseSchema,
@@ -69,4 +76,43 @@ export async function updateSection(
 
   const parsedContent = schema.parse(content);
   return updateSectionContent(sectionId, parsedContent);
+}
+
+/**
+ * Retouche IA d'un seul bloc (1.7) : régénère son contenu en ajustant le
+ * ton et/ou la longueur, en restant cohérent avec le produit et l'angle
+ * d'offre validé. Le résultat reste ensuite modifiable manuellement
+ * comme n'importe quel bloc généré (1.3).
+ */
+export async function regenerateSection(
+  userId: string,
+  pageId: string,
+  sectionId: string,
+  options: { tone: RetouchTone; length: RetouchLength },
+) {
+  const page = await getOwnedPage(userId, pageId);
+  const section = page.sections.find((s) => s.id === sectionId) ?? (await findSection(pageId, sectionId));
+  if (!section) throw new SectionNotFoundError();
+  if (!page.offerAngle) throw new NoSelectedOfferAngleError();
+
+  const schema = sectionContentSchemaByType[section.type as GeneratableSectionType];
+  if (!schema) throw new UnsupportedSectionTypeError();
+
+  const newContent = await callClaudeJson(
+    {
+      system: buildSectionRetouchSystemPrompt(section.type),
+      prompt: buildSectionRetouchPrompt(
+        page.product,
+        page.offerAngle,
+        section.type,
+        section.content,
+        options.tone,
+        options.length,
+      ),
+      maxTokens: 2048,
+    },
+    (raw) => schema.parse(raw),
+  );
+
+  return updateSectionContent(sectionId, newContent);
 }

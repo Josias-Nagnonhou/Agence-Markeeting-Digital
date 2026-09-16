@@ -21,7 +21,12 @@ export function findPageByProductId(productId: string) {
 export function findPageOwnedByUser(userId: string, pageId: string) {
   return prisma.page.findFirst({
     where: { id: pageId, product: { userId } },
-    include: { sections: { orderBy: { position: "asc" } }, template: true },
+    include: {
+      sections: { orderBy: { position: "asc" } },
+      template: true,
+      product: true,
+      offerAngle: true,
+    },
   });
 }
 

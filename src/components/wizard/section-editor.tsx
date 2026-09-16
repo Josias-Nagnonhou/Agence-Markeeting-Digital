@@ -4,9 +4,16 @@ import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import type { SectionType } from "@/generated/prisma/enums";
+import {
+  retouchToneOptions,
+  retouchLengthOptions,
+  type RetouchTone,
+  type RetouchLength,
+} from "@/lib/ai/prompts/section-retouch";
 
 const sectionTitles: Partial<Record<SectionType, string>> = {
   HEADLINE: "Headline",
@@ -26,10 +33,16 @@ export interface SectionData {
 
 export function SectionEditor({ section, pageId }: { section: SectionData; pageId: string }) {
   const [content, setContent] = useState(section.content as Record<string, unknown>);
+  const [version, setVersion] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const lastSavedRef = useRef(JSON.stringify(section.content));
+
+  const [tone, setTone] = useState<RetouchTone>("STANDARD");
+  const [length, setLength] = useState<RetouchLength>("STANDARD");
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [regenerateError, setRegenerateError] = useState<string | null>(null);
 
   async function save(nextContent: Record<string, unknown>) {
     const serialized = JSON.stringify(nextContent);
@@ -55,6 +68,29 @@ export function SectionEditor({ section, pageId }: { section: SectionData; pageI
     }
   }
 
+  async function handleRegenerate() {
+    setIsRegenerating(true);
+    setRegenerateError(null);
+    try {
+      const response = await fetch(`/api/pages/${pageId}/sections/${section.id}/regenerate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tone, length }),
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error ?? "La retouche IA a échoué.");
+
+      const newContent = body.section.content as Record<string, unknown>;
+      lastSavedRef.current = JSON.stringify(newContent);
+      setContent(newContent);
+      setVersion((v) => v + 1);
+    } catch (err) {
+      setRegenerateError(err instanceof Error ? err.message : "La retouche IA a échoué.");
+    } finally {
+      setIsRegenerating(false);
+    }
+  }
+
   return (
     <Card>
       <div className="mb-4 flex items-center justify-between">
@@ -64,9 +100,38 @@ export function SectionEditor({ section, pageId }: { section: SectionData; pageI
         </span>
       </div>
 
-      <SectionFields type={section.type} content={content} onBlurSave={save} />
+      <SectionFields key={version} type={section.type} content={content} onBlurSave={save} />
 
       {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+
+      <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-gray-100 pt-4">
+        <Select
+          value={tone}
+          onChange={(e) => setTone(e.target.value as RetouchTone)}
+          className="h-8 w-auto text-xs"
+        >
+          {retouchToneOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </Select>
+        <Select
+          value={length}
+          onChange={(e) => setLength(e.target.value as RetouchLength)}
+          className="h-8 w-auto text-xs"
+        >
+          {retouchLengthOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </Select>
+        <Button variant="secondary" size="sm" onClick={handleRegenerate} isLoading={isRegenerating}>
+          Régénérer avec l&apos;IA
+        </Button>
+        {regenerateError && <p className="text-xs text-red-600">{regenerateError}</p>}
+      </div>
     </Card>
   );
 }
