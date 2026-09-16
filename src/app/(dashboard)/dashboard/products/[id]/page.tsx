@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { auth } from "@/lib/auth/auth";
 import { getProductForUser } from "@/modules/product/product.service";
 import { productCategoryOptions } from "@/modules/product/product.types";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Stepper, type WizardStep } from "@/components/wizard/stepper";
 
 export default async function ProductDetailPage({
@@ -20,9 +22,11 @@ export default async function ProductDetailPage({
     productCategoryOptions.find((option) => option.value === product.category)?.label ??
     product.category;
 
+  const selectedAngle = product.offerAngles.find((angle) => angle.status === "SELECTED");
+
   const steps: WizardStep[] = [
     { key: "product", label: "Produit", status: "done" },
-    { key: "offer", label: "Offre", status: "current" },
+    { key: "offer", label: "Offre", status: selectedAngle ? "done" : "current" },
     { key: "copy", label: "Copy", status: "upcoming" },
     { key: "design", label: "Design", status: "upcoming" },
     { key: "checkout", label: "Checkout", status: "upcoming" },
@@ -77,13 +81,36 @@ export default async function ProductDetailPage({
           )}
         </Card>
 
-        <Card className="flex flex-col items-start justify-center gap-2 bg-gray-50">
-          <h2 className="font-semibold">Étape suivante — Positionnement d&apos;offre</h2>
-          <p className="text-sm text-gray-500">
-            Le moteur IA de positionnement d&apos;offre (reformulation de la promesse, bénéfices clés,
-            angle différenciant) arrive à la prochaine étape du build.
-          </p>
-        </Card>
+        {selectedAngle ? (
+          <Card className="flex flex-col gap-3 bg-gray-50">
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold">Angle d&apos;offre retenu</h2>
+              <Link href={`/dashboard/products/${product.id}/offer`} className="text-xs font-medium text-gray-500 underline">
+                Modifier
+              </Link>
+            </div>
+            <p className="text-sm font-medium">{selectedAngle.promise}</p>
+            <p className="text-sm text-gray-600">{selectedAngle.differentiator}</p>
+            <ul className="space-y-1 text-sm text-gray-600">
+              {selectedAngle.benefits.map((benefit) => (
+                <li key={benefit} className="flex gap-2">
+                  <span aria-hidden>•</span>
+                  <span>{benefit}</span>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        ) : (
+          <Card className="flex flex-col items-start justify-center gap-3 bg-gray-50">
+            <h2 className="font-semibold">Étape suivante — Positionnement d&apos;offre</h2>
+            <p className="text-sm text-gray-500">
+              Laisse l&apos;IA reformuler ta promesse et proposer 3 angles différenciants à choisir.
+            </p>
+            <Link href={`/dashboard/products/${product.id}/offer`}>
+              <Button>Générer le positionnement d&apos;offre</Button>
+            </Link>
+          </Card>
+        )}
       </div>
     </div>
   );

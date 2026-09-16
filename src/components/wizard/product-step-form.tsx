@@ -49,7 +49,7 @@ export function ProductStepForm() {
       return;
     }
 
-    router.push(`/dashboard/products/${body.product.id}`);
+    router.push(`/dashboard/products/${body.product.id}/offer`);
   }
 
   return (
