@@ -3,7 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
-const DEFAULT_MODEL = process.env.GEMINI_MODEL ?? "gemini-2.0-flash";
+const DEFAULT_MODEL = process.env.GEMINI_MODEL ?? "gemini-3.6-flash";
 
 export type AiJsonCallArgs = {
   system: string;
