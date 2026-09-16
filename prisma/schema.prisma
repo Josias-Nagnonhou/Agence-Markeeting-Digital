@@ -443,7 +443,7 @@ model HostingSubscription {
   pageId           String             @unique
   plan             SubscriptionPlan   @default(HOSTING_BASIC)
   status           SubscriptionStatus @default(TRIALING)
-  provider         BillingProvider
+  provider         BillingProvider?
   providerRef      String?
   currentPeriodEnd DateTime?
   createdAt        DateTime           @default(now())

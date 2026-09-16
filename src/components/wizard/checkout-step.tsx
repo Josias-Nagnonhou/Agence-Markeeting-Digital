@@ -119,7 +119,7 @@ export function CheckoutStep({
       </Card>
 
       <div className="flex justify-end">
-        <Button onClick={() => router.push(`/dashboard/products/${productId}`)}>
+        <Button onClick={() => router.push(`/dashboard/products/${productId}/publish`)}>
           Continuer vers la publication
         </Button>
       </div>

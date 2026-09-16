@@ -37,8 +37,18 @@ export default async function ProductDetailPage({
     { key: "copy", label: "Copy", status: hasCopy ? "done" : selectedAngle ? "current" : "upcoming" },
     { key: "design", label: "Design", status: hasTemplate ? "done" : hasCopy ? "current" : "upcoming" },
     { key: "checkout", label: "Checkout", status: hasTemplate ? "done" : "upcoming" },
-    { key: "publish", label: "Publication", status: "upcoming" },
+    {
+      key: "publish",
+      label: "Publication",
+      status: page?.status === "PUBLISHED" ? "done" : hasTemplate ? "current" : "upcoming",
+    },
   ];
+
+  const publishStatusLabels: Record<string, string> = {
+    DRAFT: "Brouillon",
+    PUBLISHED: "Publiée",
+    PAUSED: "En pause",
+  };
 
   return (
     <div className="space-y-8">
@@ -172,6 +182,28 @@ export default async function ProductDetailPage({
               <a href={product.paymentLinkUrl} className="text-gray-900 underline" target="_blank" rel="noreferrer">
                 {product.paymentLinkUrl}
               </a>
+            </p>
+          </Card>
+        )}
+
+        {hasTemplate && page && (
+          <Card className="flex flex-col gap-3 bg-gray-50 md:col-span-2">
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold">Publication</h2>
+              <Link href={`/dashboard/products/${product.id}/publish`} className="text-xs font-medium text-gray-500 underline">
+                Gérer
+              </Link>
+            </div>
+            <p className="text-sm text-gray-600">
+              Statut : <span className="font-medium text-gray-900">{publishStatusLabels[page.status]}</span>
+              {page.status === "PUBLISHED" && (
+                <>
+                  {" — "}
+                  <a href={`/p/${page.slug}`} target="_blank" rel="noreferrer" className="text-gray-900 underline">
+                    /p/{page.slug}
+                  </a>
+                </>
+              )}
             </p>
           </Card>
         )}
