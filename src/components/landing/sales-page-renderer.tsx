@@ -15,10 +15,12 @@ export function SalesPageRenderer({
   sections,
   themeKey,
   ctaHref,
+  heroImageUrl,
 }: {
   sections: RenderableSection[];
   themeKey: string | null | undefined;
   ctaHref: string;
+  heroImageUrl?: string | null;
 }) {
   const theme = getThemeByKey(themeKey);
 
@@ -41,6 +43,14 @@ export function SalesPageRenderer({
       {/* Hero */}
       <section className={cn(theme.heroBg, "px-6 py-16 text-center sm:py-24")}>
         <div className="mx-auto max-w-2xl">
+          {heroImageUrl && (
+            // eslint-disable-next-line @next/next/no-img-element -- image externe (visuel produit ou photo libre), pas d'optimisation next/image nécessaire
+            <img
+              src={heroImageUrl}
+              alt=""
+              className="mx-auto mb-8 aspect-video w-full max-w-xl rounded-2xl object-cover shadow-lg"
+            />
+          )}
           {headline && (
             <h1 className={cn(theme.headlineFont, theme.heroText, "text-3xl sm:text-5xl")}>
               {headline.text}

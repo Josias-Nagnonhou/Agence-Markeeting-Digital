@@ -4,6 +4,7 @@ import {
   findPageOwnedByUser,
   createDraftPage,
   updatePageOfferAngle,
+  updatePageHeroImage,
   listTemplates,
   findTemplateById,
   updatePageTemplate,
@@ -57,6 +58,11 @@ export async function getOrCreateDraftPageForProduct(userId: string, productId: 
   const [defaultTemplate] = await listTemplates();
   const page = await createDraftPage(productId, product.name, selectedAngle.id, defaultTemplate?.id);
   return { page, product, selectedAngle };
+}
+
+/** Renseigne le visuel de la page (utilisé en hero et comme image OG). */
+export async function setPageHeroImage(pageId: string, ogImageUrl: string) {
+  await updatePageHeroImage(pageId, ogImageUrl);
 }
 
 export async function getAvailableTemplates() {

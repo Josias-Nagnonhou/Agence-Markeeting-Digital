@@ -54,6 +54,7 @@ export default async function DesignPage({ params }: { params: Promise<{ id: str
           templates={templates}
           initialTemplateId={page.templateId}
           ctaHref={`/p/${page.slug}/go`}
+          heroImageUrl={page.ogImageUrl}
         />
       )}
     </div>

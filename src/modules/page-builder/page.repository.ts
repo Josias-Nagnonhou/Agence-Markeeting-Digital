@@ -49,6 +49,10 @@ export function updatePageOfferAngle(pageId: string, offerAngleId: string) {
   return prisma.page.update({ where: { id: pageId }, data: { offerAngleId } });
 }
 
+export function updatePageHeroImage(pageId: string, ogImageUrl: string) {
+  return prisma.page.update({ where: { id: pageId }, data: { ogImageUrl } });
+}
+
 export function listTemplates() {
   return prisma.template.findMany({ orderBy: { createdAt: "asc" } });
 }

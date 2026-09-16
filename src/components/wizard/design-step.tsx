@@ -20,6 +20,7 @@ export function DesignStep({
   templates,
   initialTemplateId,
   ctaHref,
+  heroImageUrl,
 }: {
   productId: string;
   pageId: string;
@@ -27,6 +28,7 @@ export function DesignStep({
   templates: TemplateOption[];
   initialTemplateId: string | null;
   ctaHref: string;
+  heroImageUrl?: string | null;
 }) {
   const router = useRouter();
   const [selectedTemplateId, setSelectedTemplateId] = useState(initialTemplateId ?? templates[0]?.id ?? null);
@@ -114,7 +116,7 @@ export function DesignStep({
             viewport === "mobile" ? "w-full max-w-sm" : "w-full",
           )}
         >
-          <SalesPageRenderer sections={sections} themeKey={themeKey} ctaHref={ctaHref} />
+          <SalesPageRenderer sections={sections} themeKey={themeKey} ctaHref={ctaHref} heroImageUrl={heroImageUrl} />
         </div>
       </div>
 

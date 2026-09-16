@@ -1,4 +1,5 @@
 import { callAiJson } from "@/lib/ai/ai-client";
+import { fetchStockPhotoUrl } from "@/lib/images/stock-photo-client";
 import { COPYWRITING_SYSTEM_PROMPT, buildCopywritingPrompt } from "@/lib/ai/prompts/copywriting";
 import {
   buildSectionRetouchSystemPrompt,
@@ -10,6 +11,7 @@ import {
   getOrCreateDraftPageForProduct,
   getExistingPageForProduct,
   getOwnedPage,
+  setPageHeroImage,
   NoSelectedOfferAngleError,
 } from "@/modules/page-builder/page.service";
 import {
@@ -50,6 +52,12 @@ export async function generateCopyForProduct(userId: string, productId: string) 
   );
 
   const sections = await replaceSections(page.id, toSectionRecords(copy));
+
+  if (!page.ogImageUrl) {
+    const heroImageUrl = product.images[0]?.url ?? (await fetchStockPhotoUrl(product.category));
+    if (heroImageUrl) await setPageHeroImage(page.id, heroImageUrl);
+  }
+
   return { page, sections };
 }
 

@@ -24,6 +24,9 @@ export async function generateMetadata({
   return {
     title: page.seoTitle ?? page.title,
     description: page.seoDescription ?? undefined,
+    openGraph: page.ogImageUrl
+      ? { title: page.seoTitle ?? page.title, images: [page.ogImageUrl] }
+      : undefined,
   };
 }
 
@@ -43,6 +46,7 @@ export default async function PublicSalesPage({
       sections={page.sections}
       themeKey={themeKey}
       ctaHref={`/p/${page.slug}/go`}
+      heroImageUrl={page.ogImageUrl}
     />
   );
 }
