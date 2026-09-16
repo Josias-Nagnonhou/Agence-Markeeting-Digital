@@ -1,4 +1,4 @@
-import { callClaudeJson } from "@/lib/ai/claude-client";
+import { callAiJson } from "@/lib/ai/ai-client";
 import { COPYWRITING_SYSTEM_PROMPT, buildCopywritingPrompt } from "@/lib/ai/prompts/copywriting";
 import {
   buildSectionRetouchSystemPrompt,
@@ -40,7 +40,7 @@ export class UnsupportedSectionTypeError extends Error {
 export async function generateCopyForProduct(userId: string, productId: string) {
   const { page, product, selectedAngle } = await getOrCreateDraftPageForProduct(userId, productId);
 
-  const copy = await callClaudeJson(
+  const copy = await callAiJson(
     {
       system: COPYWRITING_SYSTEM_PROMPT,
       prompt: buildCopywritingPrompt(product, selectedAngle),
@@ -98,7 +98,7 @@ export async function regenerateSection(
   const schema = sectionContentSchemaByType[section.type as GeneratableSectionType];
   if (!schema) throw new UnsupportedSectionTypeError();
 
-  const newContent = await callClaudeJson(
+  const newContent = await callAiJson(
     {
       system: buildSectionRetouchSystemPrompt(section.type),
       prompt: buildSectionRetouchPrompt(

@@ -1,4 +1,4 @@
-import { callClaudeJson } from "@/lib/ai/claude-client";
+import { callAiJson } from "@/lib/ai/ai-client";
 import { CRO_DIAGNOSTIC_SYSTEM_PROMPT, buildDiagnosticPrompt } from "@/lib/ai/prompts/cro-diagnostic";
 import { getOwnedPage } from "@/modules/page-builder/page.service";
 import {
@@ -26,7 +26,7 @@ export class EmptyPageContentError extends Error {
 }
 
 async function runDiagnostic(sourceLabel: string, content: string) {
-  return callClaudeJson(
+  return callAiJson(
     {
       system: CRO_DIAGNOSTIC_SYSTEM_PROMPT,
       prompt: buildDiagnosticPrompt(sourceLabel, content),

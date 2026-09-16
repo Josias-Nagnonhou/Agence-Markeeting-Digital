@@ -1,4 +1,4 @@
-import { callClaudeJson } from "@/lib/ai/claude-client";
+import { callAiJson } from "@/lib/ai/ai-client";
 import { OFFER_ANGLES_SYSTEM_PROMPT, buildOfferAnglesPrompt } from "@/lib/ai/prompts/offer-angles";
 import { getOwnedProduct } from "@/modules/product/product.service";
 import { offerAnglesResponseSchema } from "@/modules/offer-engine/offer-engine.types";
@@ -22,7 +22,7 @@ export async function getOfferAngles(userId: string, productId: string) {
 export async function generateOfferAngles(userId: string, productId: string) {
   const product = await getOwnedProduct(userId, productId);
 
-  const angles = await callClaudeJson(
+  const angles = await callAiJson(
     {
       system: OFFER_ANGLES_SYSTEM_PROMPT,
       prompt: buildOfferAnglesPrompt(product),
