@@ -48,7 +48,7 @@ export function OfferStep({
       });
       const body = await response.json();
       if (!response.ok) throw new Error(body.error ?? "La sélection a échoué.");
-      router.push(`/dashboard/products/${productId}`);
+      router.push(`/dashboard/products/${productId}/copy`);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "La sélection a échoué.");

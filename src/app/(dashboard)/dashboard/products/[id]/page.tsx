@@ -4,6 +4,7 @@ import Link from "next/link";
 import { auth } from "@/lib/auth/auth";
 import { getProductForUser } from "@/modules/product/product.service";
 import { productCategoryOptions } from "@/modules/product/product.types";
+import { getCopyForProduct } from "@/modules/copywriting/copywriting.service";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Stepper, type WizardStep } from "@/components/wizard/stepper";
@@ -23,11 +24,19 @@ export default async function ProductDetailPage({
     product.category;
 
   const selectedAngle = product.offerAngles.find((angle) => angle.status === "SELECTED");
+  const { sections } = await getCopyForProduct(session!.user.id, id);
+  const headline = sections.find((section) => section.type === "HEADLINE")?.content as
+    | { text: string }
+    | undefined;
 
   const steps: WizardStep[] = [
     { key: "product", label: "Produit", status: "done" },
     { key: "offer", label: "Offre", status: selectedAngle ? "done" : "current" },
-    { key: "copy", label: "Copy", status: "upcoming" },
+    {
+      key: "copy",
+      label: "Copy",
+      status: sections.length > 0 ? "done" : selectedAngle ? "current" : "upcoming",
+    },
     { key: "design", label: "Design", status: "upcoming" },
     { key: "checkout", label: "Checkout", status: "upcoming" },
     { key: "publish", label: "Publication", status: "upcoming" },
@@ -109,6 +118,26 @@ export default async function ProductDetailPage({
             <Link href={`/dashboard/products/${product.id}/offer`}>
               <Button>Générer le positionnement d&apos;offre</Button>
             </Link>
+          </Card>
+        )}
+
+        {selectedAngle && (
+          <Card className="flex flex-col gap-3 bg-gray-50 md:col-span-2">
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold">Copywriting</h2>
+              <Link href={`/dashboard/products/${product.id}/copy`} className="text-xs font-medium text-gray-500 underline">
+                {sections.length > 0 ? "Modifier" : "Générer"}
+              </Link>
+            </div>
+            {headline ? (
+              <p className="text-sm text-gray-600">
+                Headline actuel : <span className="font-medium text-gray-900">{headline.text}</span>
+              </p>
+            ) : (
+              <p className="text-sm text-gray-500">
+                Le copy n&apos;a pas encore été généré pour cette page.
+              </p>
+            )}
           </Card>
         )}
       </div>
