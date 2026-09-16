@@ -36,7 +36,7 @@ export default async function ProductDetailPage({
     { key: "offer", label: "Offre", status: selectedAngle ? "done" : "current" },
     { key: "copy", label: "Copy", status: hasCopy ? "done" : selectedAngle ? "current" : "upcoming" },
     { key: "design", label: "Design", status: hasTemplate ? "done" : hasCopy ? "current" : "upcoming" },
-    { key: "checkout", label: "Checkout", status: "upcoming" },
+    { key: "checkout", label: "Checkout", status: hasTemplate ? "done" : "upcoming" },
     { key: "publish", label: "Publication", status: "upcoming" },
   ];
 
@@ -155,6 +155,23 @@ export default async function ProductDetailPage({
               ) : (
                 "Choisis une direction visuelle et prévisualise ta page de vente."
               )}
+            </p>
+          </Card>
+        )}
+
+        {hasTemplate && (
+          <Card className="flex flex-col gap-3 bg-gray-50 md:col-span-2">
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold">Checkout</h2>
+              <Link href={`/dashboard/products/${product.id}/checkout`} className="text-xs font-medium text-gray-500 underline">
+                Gérer
+              </Link>
+            </div>
+            <p className="truncate text-sm text-gray-600">
+              Lien de paiement ({product.paymentProvider}) :{" "}
+              <a href={product.paymentLinkUrl} className="text-gray-900 underline" target="_blank" rel="noreferrer">
+                {product.paymentLinkUrl}
+              </a>
             </p>
           </Card>
         )}

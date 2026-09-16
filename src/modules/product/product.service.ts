@@ -1,11 +1,14 @@
 import {
   createProductInputSchema,
+  updateProductPaymentSchema,
   type CreateProductInput,
+  type UpdateProductPaymentInput,
 } from "@/modules/product/product.types";
 import {
   createProductRecord,
   listProductsByUser,
   findProductByIdForUser,
+  updateProductPaymentRecord,
 } from "@/modules/product/product.repository";
 
 export async function createProduct(userId: string, input: CreateProductInput) {
@@ -37,4 +40,14 @@ export async function getOwnedProduct(userId: string, productId: string) {
   const product = await findProductByIdForUser(userId, productId);
   if (!product) throw new ProductNotFoundError();
   return product;
+}
+
+export async function updateProductPayment(
+  userId: string,
+  productId: string,
+  input: UpdateProductPaymentInput,
+) {
+  await getOwnedProduct(userId, productId);
+  const data = updateProductPaymentSchema.parse(input);
+  return updateProductPaymentRecord(productId, data);
 }

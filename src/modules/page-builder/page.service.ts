@@ -7,6 +7,7 @@ import {
   listTemplates,
   findTemplateById,
   updatePageTemplate,
+  findPageBySlug,
 } from "@/modules/page-builder/page.repository";
 
 export class PageNotFoundError extends Error {
@@ -76,4 +77,14 @@ export async function selectTemplateForPage(userId: string, pageId: string, temp
 export async function getExistingPageForProduct(userId: string, productId: string) {
   await getOwnedProduct(userId, productId);
   return findPageByProductId(productId);
+}
+
+/**
+ * Accès public (sans authentification) : utilisé par la page publique et
+ * la redirection checkout, qui s'adressent à l'acheteur, pas au vendeur.
+ */
+export async function getPageBySlug(slug: string) {
+  const page = await findPageBySlug(slug);
+  if (!page) throw new PageNotFoundError();
+  return page;
 }

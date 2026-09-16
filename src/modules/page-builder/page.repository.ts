@@ -59,3 +59,10 @@ export function updatePageTemplate(pageId: string, templateId: string) {
     include: { sections: { orderBy: { position: "asc" } }, template: true },
   });
 }
+
+export function findPageBySlug(slug: string) {
+  return prisma.page.findUnique({
+    where: { slug },
+    include: { sections: { orderBy: { position: "asc" } }, template: true, product: true },
+  });
+}

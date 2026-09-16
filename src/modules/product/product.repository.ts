@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db/prisma";
 import type { CreateProductInput } from "@/modules/product/product.types";
+import type { PaymentProvider } from "@/generated/prisma/enums";
 
 export function createProductRecord(userId: string, input: CreateProductInput) {
   return prisma.product.create({
@@ -37,4 +38,11 @@ export function findProductByIdForUser(userId: string, productId: string) {
     where: { id: productId, userId },
     include: { images: { orderBy: { position: "asc" } }, offerAngles: true, pages: true },
   });
+}
+
+export function updateProductPaymentRecord(
+  productId: string,
+  data: { paymentProvider: PaymentProvider; paymentLinkUrl: string },
+) {
+  return prisma.product.update({ where: { id: productId }, data });
 }

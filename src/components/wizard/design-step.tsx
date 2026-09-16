@@ -119,7 +119,7 @@ export function DesignStep({
       </div>
 
       <div className="flex justify-end">
-        <Button onClick={() => router.push(`/dashboard/products/${productId}`)}>
+        <Button onClick={() => router.push(`/dashboard/products/${productId}/checkout`)}>
           Continuer vers le checkout
         </Button>
       </div>

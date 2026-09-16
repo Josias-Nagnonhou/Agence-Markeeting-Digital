@@ -38,3 +38,10 @@ export const createProductInputSchema = z.object({
 });
 
 export type CreateProductInput = z.infer<typeof createProductInputSchema>;
+
+export const updateProductPaymentSchema = z.object({
+  paymentProvider: z.nativeEnum(PaymentProvider),
+  paymentLinkUrl: z.string().url("Colle un lien de paiement valide (https://...)."),
+});
+
+export type UpdateProductPaymentInput = z.infer<typeof updateProductPaymentSchema>;
