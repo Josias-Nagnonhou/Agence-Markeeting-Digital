@@ -1,12 +1,15 @@
 import { LocalDiskStorageProvider } from "@/modules/storage/providers/local-disk.provider";
+import { VercelBlobStorageProvider } from "@/modules/storage/providers/vercel-blob.provider";
 import type { StorageProvider } from "@/modules/storage/storage.types";
 
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_CONTENT_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
 
 function getStorageProvider(): StorageProvider {
-  // Point d'extension unique : brancher un provider cloud (Vercel Blob,
-  // S3...) ici selon l'environnement, sans changer les appelants.
+  // Le disque local n'est pas persistant/accessible en production
+  // serverless (Vercel) : on bascule sur Vercel Blob dès que son token
+  // est configuré, sans changer les appelants.
+  if (process.env.BLOB_READ_WRITE_TOKEN) return new VercelBlobStorageProvider();
   return new LocalDiskStorageProvider();
 }
 
