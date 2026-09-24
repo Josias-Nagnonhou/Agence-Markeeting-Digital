@@ -22,6 +22,9 @@ export interface Team {
   shortName: string;
   logo: string;
   country: string;
+  primaryColor: string;
+  accentColor: string;
+  lightText: boolean;
 }
 
 export interface FormResult {

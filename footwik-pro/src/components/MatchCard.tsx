@@ -4,6 +4,7 @@ import { MatchAnalysis } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/Badge";
 import { ConfidenceStars } from "@/components/ConfidenceStars";
+import { ClubCrest } from "@/components/ClubCrest";
 
 export function MatchCard({ match }: { match: MatchAnalysis }) {
   return (
@@ -24,16 +25,12 @@ export function MatchCard({ match }: { match: MatchAnalysis }) {
 
       <div className="mt-3 flex items-center justify-between">
         <div className="flex flex-1 flex-col items-center gap-1">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-pitch-600 font-display text-xs font-bold text-ink">
-            {match.home.logo}
-          </div>
+          <ClubCrest team={match.home} size={40} />
           <span className="text-center text-sm font-medium text-ink">{match.home.shortName}</span>
         </div>
         <span className="px-2 font-display text-lg text-ink-faint">VS</span>
         <div className="flex flex-1 flex-col items-center gap-1">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-pitch-600 font-display text-xs font-bold text-ink">
-            {match.away.logo}
-          </div>
+          <ClubCrest team={match.away} size={40} />
           <span className="text-center text-sm font-medium text-ink">{match.away.shortName}</span>
         </div>
       </div>

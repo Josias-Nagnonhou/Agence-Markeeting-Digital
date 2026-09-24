@@ -1,28 +1,45 @@
 import { Team } from "@/lib/types";
 
-function team(id: string, name: string, shortName: string, country: string): Team {
-  return { id, name, shortName, country, logo: shortName.slice(0, 3).toUpperCase() };
+function team(
+  id: string,
+  name: string,
+  shortName: string,
+  country: string,
+  primaryColor: string,
+  accentColor: string,
+  lightText = true,
+): Team {
+  return {
+    id,
+    name,
+    shortName,
+    country,
+    logo: shortName.slice(0, 3).toUpperCase(),
+    primaryColor,
+    accentColor,
+    lightText,
+  };
 }
 
 export const teams: Record<string, Team> = {
-  psg: team("psg", "Paris Saint-Germain", "PSG", "France"),
-  lens: team("lens", "RC Lens", "Lens", "France"),
-  real: team("real", "Real Madrid", "Real", "Espagne"),
-  barca: team("barca", "FC Barcelone", "Barça", "Espagne"),
-  city: team("city", "Manchester City", "City", "Angleterre"),
-  arsenal: team("arsenal", "Arsenal", "Arsenal", "Angleterre"),
-  inter: team("inter", "Inter Milan", "Inter", "Italie"),
-  milan: team("milan", "AC Milan", "Milan", "Italie"),
-  bayern: team("bayern", "Bayern Munich", "Bayern", "Allemagne"),
-  dortmund: team("dortmund", "Borussia Dortmund", "Dortmund", "Allemagne"),
-  senegal: team("senegal", "Sénégal", "Sénégal", "Sénégal"),
-  cotedivoire: team("cotedivoire", "Côte d'Ivoire", "CIV", "Côte d'Ivoire"),
-  cameroun: team("cameroun", "Cameroun", "Cameroun", "Cameroun"),
-  benin: team("benin", "Bénin", "Bénin", "Bénin"),
-  asec: team("asec", "ASEC Mimosas", "ASEC", "Côte d'Ivoire"),
-  africasports: team("africasports", "Africa Sports", "Africa", "Côte d'Ivoire"),
-  jaraaf: team("jaraaf", "Jaraaf de Dakar", "Jaraaf", "Sénégal"),
-  casasport: team("casasport", "Casa Sports", "Casa", "Sénégal"),
-  coton: team("coton", "Coton Sport", "Coton", "Cameroun"),
-  buffles: team("buffles", "Buffles du Borgou", "Buffles", "Bénin"),
+  psg: team("psg", "Paris Saint-Germain", "PSG", "France", "#113369", "#E30613"),
+  lens: team("lens", "RC Lens", "Lens", "France", "#FFD100", "#C8102E", false),
+  real: team("real", "Real Madrid", "Real", "Espagne", "#1B3A8A", "#F5C542"),
+  barca: team("barca", "FC Barcelone", "Barça", "Espagne", "#A50044", "#004D98"),
+  city: team("city", "Manchester City", "City", "Angleterre", "#6CABDD", "#1C2C5B", false),
+  arsenal: team("arsenal", "Arsenal", "Arsenal", "Angleterre", "#EF0107", "#063672"),
+  inter: team("inter", "Inter Milan", "Inter", "Italie", "#0B1F4B", "#000000"),
+  milan: team("milan", "AC Milan", "Milan", "Italie", "#FB090B", "#000000"),
+  bayern: team("bayern", "Bayern Munich", "Bayern", "Allemagne", "#DC052D", "#0066B2"),
+  dortmund: team("dortmund", "Borussia Dortmund", "Dortmund", "Allemagne", "#FDE100", "#000000", false),
+  senegal: team("senegal", "Sénégal", "Sénégal", "Sénégal", "#00853F", "#FDEF42"),
+  cotedivoire: team("cotedivoire", "Côte d'Ivoire", "CIV", "Côte d'Ivoire", "#F77F00", "#009A44", false),
+  cameroun: team("cameroun", "Cameroun", "Cameroun", "Cameroun", "#007A33", "#CE1126"),
+  benin: team("benin", "Bénin", "Bénin", "Bénin", "#008751", "#FCD116"),
+  asec: team("asec", "ASEC Mimosas", "ASEC", "Côte d'Ivoire", "#FCD116", "#000000", false),
+  africasports: team("africasports", "Africa Sports", "Africa", "Côte d'Ivoire", "#DA291C", "#007A33"),
+  jaraaf: team("jaraaf", "Jaraaf de Dakar", "Jaraaf", "Sénégal", "#00A650", "#FFFFFF"),
+  casasport: team("casasport", "Casa Sports", "Casa", "Sénégal", "#1D428A", "#FCD116"),
+  coton: team("coton", "Coton Sport", "Coton", "Cameroun", "#C8102E", "#007A33"),
+  buffles: team("buffles", "Buffles du Borgou", "Buffles", "Bénin", "#003DA5", "#FCD116"),
 };

@@ -7,6 +7,7 @@ import { ConfidenceStars } from "@/components/ConfidenceStars";
 import { StatBar } from "@/components/StatBar";
 import { FormRow } from "@/components/FormBadge";
 import { PremiumGate } from "@/components/PremiumGate";
+import { ClubCrest } from "@/components/ClubCrest";
 
 export function generateStaticParams() {
   return matches.map((m) => ({ id: m.id }));
@@ -54,18 +55,14 @@ export default function MatchPage({ params }: { params: { id: string } }) {
         </div>
         <div className="mt-4 flex items-center justify-center gap-6 sm:gap-10">
           <div className="flex flex-1 flex-col items-center gap-2">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-pitch-600 font-display text-lg font-bold text-ink">
-              {match.home.logo}
-            </div>
+            <ClubCrest team={match.home} size={64} />
             <span className="text-center font-medium text-ink">{match.home.name}</span>
           </div>
           <div className="font-display text-2xl text-ink-faint">
             {match.status === "termine" ? match.finalScore : "VS"}
           </div>
           <div className="flex flex-1 flex-col items-center gap-2">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-pitch-600 font-display text-lg font-bold text-ink">
-              {match.away.logo}
-            </div>
+            <ClubCrest team={match.away} size={64} />
             <span className="text-center font-medium text-ink">{match.away.name}</span>
           </div>
         </div>

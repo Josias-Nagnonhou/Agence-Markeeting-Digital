@@ -6,6 +6,7 @@ import { formatShortDate } from "@/lib/utils";
 import { MatchCard } from "@/components/MatchCard";
 import { Badge } from "@/components/Badge";
 import { AccountTabs } from "@/components/AccountTabs";
+import { ClubCrest } from "@/components/ClubCrest";
 
 export const metadata = { title: "Mon espace abonné — Footwik Pro" };
 
@@ -62,9 +63,7 @@ export default function ComptePage() {
     <div className="flex flex-wrap gap-3">
       {followed.map((t) => (
         <div key={t.id} className="flex items-center gap-2 rounded-full border border-pitch-400 bg-pitch-800 px-3 py-1.5">
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-pitch-600 text-[10px] font-bold text-ink">
-            {t.logo}
-          </span>
+          <ClubCrest team={t} size={22} />
           <span className="text-sm text-ink-muted">{t.name}</span>
         </div>
       ))}
