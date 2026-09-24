@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Phone, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
-type Channel = "email" | "phone";
 type Step = "identifiant" | "code";
 
 export function AuthForm({
@@ -15,9 +13,8 @@ export function AuthForm({
   mode: "connexion" | "inscription";
   next?: string;
 }) {
-  const [channel, setChannel] = useState<Channel>("email");
   const [step, setStep] = useState<Step>("identifiant");
-  const [identifier, setIdentifier] = useState("");
+  const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -32,30 +29,25 @@ export function AuthForm({
       setError("Vous devez confirmer avoir 18 ans ou plus pour vous inscrire.");
       return;
     }
-    if (!identifier) {
-      setError(channel === "email" ? "Merci de renseigner votre email." : "Merci de renseigner votre numéro de téléphone.");
+    if (!email) {
+      setError("Merci de renseigner votre email.");
       return;
     }
 
     setLoading(true);
     try {
       const supabase = createClient();
-      const { error: otpError } =
-        channel === "email"
-          ? await supabase.auth.signInWithOtp({
-              email: identifier,
-              options: {
-                emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
-              },
-            })
-          : await supabase.auth.signInWithOtp({ phone: identifier });
+      const { error: otpError } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+        },
+      });
 
       if (otpError) throw otpError;
       setStep("code");
       setInfo(
-        channel === "email"
-          ? "Vérifiez votre boîte mail : cliquez sur le lien reçu (ou saisissez le code s'il en contient un)."
-          : "Un code de vérification vient de vous être envoyé par SMS.",
+        "Vérifiez votre boîte mail : cliquez sur le lien reçu (ou saisissez le code s'il en contient un).",
       );
     } catch (e) {
       setError(
@@ -73,11 +65,11 @@ export function AuthForm({
     setLoading(true);
     try {
       const supabase = createClient();
-      const { error: verifyError } = await supabase.auth.verifyOtp(
-        channel === "email"
-          ? { email: identifier, token: code, type: "email" }
-          : { phone: identifier, token: code, type: "sms" },
-      );
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        email,
+        token: code,
+        type: "email",
+      });
       if (verifyError) throw verifyError;
       window.location.href = next;
     } catch (e) {
@@ -96,39 +88,18 @@ export function AuthForm({
       </h1>
       <p className="mt-1 text-sm text-ink-faint">
         {mode === "connexion"
-          ? "Recevez un code à usage unique par email ou SMS."
+          ? "Recevez un code à usage unique par email."
           : "Rejoignez Footwik Pro en quelques secondes."}
       </p>
 
       {step === "identifiant" ? (
         <>
-          <div className="mt-5 flex gap-2">
-            <button
-              onClick={() => setChannel("email")}
-              className={cn(
-                "flex flex-1 items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium",
-                channel === "email" ? "border-grass bg-grass/10 text-grass" : "border-pitch-400 text-ink-muted",
-              )}
-            >
-              <Mail size={16} /> Email
-            </button>
-            <button
-              onClick={() => setChannel("phone")}
-              className={cn(
-                "flex flex-1 items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium",
-                channel === "phone" ? "border-grass bg-grass/10 text-grass" : "border-pitch-400 text-ink-muted",
-              )}
-            >
-              <Phone size={16} /> Téléphone
-            </button>
-          </div>
-
           <input
-            type={channel === "email" ? "email" : "tel"}
-            placeholder={channel === "email" ? "vous@exemple.com" : "+229 90000000"}
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
-            className="mt-4 w-full rounded-lg border border-pitch-400 bg-pitch-600/40 px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint"
+            type="email"
+            placeholder="vous@exemple.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="mt-5 w-full rounded-lg border border-pitch-400 bg-pitch-600/40 px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint"
           />
 
           {mode === "inscription" && (
@@ -167,14 +138,12 @@ export function AuthForm({
       ) : (
         <>
           {info && <p className="mt-5 text-sm text-grass">{info}</p>}
-          {channel === "email" && (
-            <p className="mt-2 text-xs text-ink-faint">
-              Le plus simple : ouvrez l&apos;email reçu et cliquez sur le
-              lien de connexion, cet écran se mettra à jour automatiquement.
-              Si votre email contient plutôt un code, saisissez-le
-              ci-dessous.
-            </p>
-          )}
+          <p className="mt-2 text-xs text-ink-faint">
+            Le plus simple : ouvrez l&apos;email reçu et cliquez sur le
+            lien de connexion, cet écran se mettra à jour automatiquement.
+            Si votre email contient plutôt un code, saisissez-le
+            ci-dessous.
+          </p>
           <input
             type="text"
             inputMode="numeric"
@@ -196,7 +165,7 @@ export function AuthForm({
             onClick={() => setStep("identifiant")}
             className="mt-2 w-full text-center text-xs text-ink-faint hover:text-ink"
           >
-            Modifier l&apos;email ou le téléphone
+            Modifier l&apos;email
           </button>
         </>
       )}
