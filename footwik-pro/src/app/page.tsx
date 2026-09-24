@@ -6,7 +6,6 @@ import { testimonials } from "@/lib/data/testimonials";
 import { MatchCard } from "@/components/MatchCard";
 import { formatPercent } from "@/lib/utils";
 import { getFounderSeatsRemaining } from "@/lib/account";
-import { RollingBall } from "@/components/RollingBall";
 
 export default async function Home() {
   const upcoming = getUpcomingMatches().slice(0, 6);
@@ -15,10 +14,8 @@ export default async function Home() {
 
   return (
     <div>
-      <section className="relative overflow-hidden border-b border-pitch-600 px-4 py-16 text-center sm:py-24">
-        <RollingBall className="top-20 sm:top-28" style={{ animationDelay: "0s" }} />
-        <RollingBall className="top-40 sm:top-56" style={{ animationDelay: "4.5s" }} />
-        <div className="relative mx-auto max-w-3xl">
+      <section className="border-b border-pitch-600 px-4 py-16 text-center sm:py-24">
+        <div className="mx-auto max-w-3xl">
           <span className="animate-fade-up inline-block rounded-full border border-grass/30 bg-grass/10 px-4 py-1.5 text-xs font-medium text-grass">
             Analyse IA · Transparence totale · Football francophone
           </span>

@@ -50,30 +50,6 @@ body {
   }
 }
 
-@keyframes roll-across {
-  0% {
-    transform: translateX(-10vw) translateY(0) rotate(0deg);
-    opacity: 0;
-  }
-  6% {
-    opacity: 1;
-  }
-  50% {
-    transform: translateX(50vw) translateY(-22px) rotate(620deg);
-  }
-  94% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(112vw) translateY(0) rotate(1240deg);
-    opacity: 0;
-  }
-}
-
-.animate-roll-ball {
-  animation: roll-across 9s linear infinite;
-}
-
 @keyframes fade-up {
   from {
     opacity: 0;
@@ -90,7 +66,6 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-roll-ball,
   .animate-fade-up {
     animation: none !important;
   }
