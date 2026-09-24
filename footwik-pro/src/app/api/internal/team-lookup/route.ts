@@ -12,6 +12,43 @@ export async function GET(req: NextRequest) {
   }
 
   const name = req.nextUrl.searchParams.get("name");
+  const all = req.nextUrl.searchParams.get("all");
+
+  if (all) {
+    const queries = [
+      "Paris Saint Germain",
+      "RC Lens",
+      "Real Madrid",
+      "Barcelona",
+      "Manchester City",
+      "Arsenal",
+      "Inter",
+      "AC Milan",
+      "Bayern Munich",
+      "Borussia Dortmund",
+      "Senegal",
+      "Ivory Coast",
+      "Cameroon",
+      "Benin",
+      "ASEC Mimosas",
+      "Africa Sports",
+      "Jaraaf",
+      "Casa Sports",
+      "Coton Sport",
+      "Buffles du Borgou",
+    ];
+    const results = [];
+    for (const q of queries) {
+      try {
+        const team = await searchTeam(q);
+        results.push({ query: q, team });
+      } catch (err) {
+        results.push({ query: q, error: err instanceof Error ? err.message : "lookup failed" });
+      }
+    }
+    return NextResponse.json({ results });
+  }
+
   if (!name) {
     return NextResponse.json({ error: "missing name" }, { status: 400 });
   }
