@@ -6,18 +6,38 @@ import { Badge } from "@/components/Badge";
 import { ConfidenceStars } from "@/components/ConfidenceStars";
 import { StatBar } from "@/components/StatBar";
 import { FormRow } from "@/components/FormBadge";
-import { PremiumGate } from "@/components/PremiumGate";
+import { FeatureGate } from "@/components/FeatureGate";
 import { ClubCrest } from "@/components/ClubCrest";
+import { getCurrentUser } from "@/lib/account";
+import { hasFeature } from "@/lib/entitlements";
+import { createClient } from "@/lib/supabase/server";
 
-export function generateStaticParams() {
-  return matches.map((m) => ({ id: m.id }));
-}
+// Rendu dynamique obligatoire : la fiche dépend de l'abonnement de
+// l'utilisateur connecté (verrouillage par formule) et journalise sa
+// consultation dans l'activité du compte.
+export const dynamic = "force-dynamic";
 
-export default function MatchPage({ params }: { params: { id: string } }) {
+export default async function MatchPage({ params }: { params: { id: string } }) {
   const match = getMatchById(params.id);
   if (!match) notFound();
 
-  const locked = !match.isFree;
+  const user = await getCurrentUser();
+  const plan = user?.plan ?? "gratuit";
+  const locked = !match.isFree && !hasFeature(plan, "full_analyses");
+
+  if (user) {
+    try {
+      const supabase = createClient();
+      await supabase.from("activity_log").insert({
+        user_id: user.id,
+        activity_type: "vue_fiche",
+        label: `Consultation : ${match.home.shortName} vs ${match.away.shortName}`,
+        metadata: { matchId: match.id },
+      });
+    } catch {
+      // best-effort, ne bloque jamais l'affichage de la fiche
+    }
+  }
 
   const Section = ({
     icon: Icon,
@@ -104,9 +124,9 @@ export default function MatchPage({ params }: { params: { id: string } }) {
         </Section>
 
         {locked ? (
-          <PremiumGate>
+          <FeatureGate feature="full_analyses" plan={plan}>
             <FicheDetails match={match} />
-          </PremiumGate>
+          </FeatureGate>
         ) : (
           <FicheDetails match={match} />
         )}

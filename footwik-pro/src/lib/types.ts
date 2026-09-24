@@ -107,12 +107,15 @@ export interface Testimonial {
 
 export type SubscriptionRegion = "afrique" | "diaspora";
 
+export type PlanId = "gratuit" | "semaine" | "mois" | "trimestre" | "an" | "vip";
+
 export interface PricingPlan {
-  id: string;
+  id: PlanId;
   name: string;
   fcfa: number;
   eur: number;
   period: string;
+  badge?: string;
   highlight?: boolean;
   features: string[];
 }

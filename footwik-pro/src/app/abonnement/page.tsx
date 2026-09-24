@@ -1,16 +1,39 @@
 "use client";
 
-import { useState } from "react";
-import { Globe2 } from "lucide-react";
-import { pricingPlans } from "@/lib/data/pricing";
+import { useEffect, useState } from "react";
+import { Globe2, Sparkles } from "lucide-react";
+import { pricingPlans, FOUNDER_TOTAL_SEATS, VIP_TOTAL_SEATS } from "@/lib/data/pricing";
 import { PricingCard } from "@/components/PricingCard";
 import { CheckoutModal } from "@/components/CheckoutModal";
+import { WaitlistModal } from "@/components/WaitlistModal";
 import { PricingPlan, SubscriptionRegion } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export default function AbonnementPage() {
   const [region, setRegion] = useState<SubscriptionRegion>("afrique");
   const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null);
+  const [showWaitlist, setShowWaitlist] = useState(false);
+  const [founderSeatsRemaining, setFounderSeatsRemaining] = useState(FOUNDER_TOTAL_SEATS);
+  const [vipSeatsRemaining, setVipSeatsRemaining] = useState(VIP_TOTAL_SEATS);
+
+  useEffect(() => {
+    fetch("/api/plan-availability")
+      .then((res) => res.json())
+      .then((data) => {
+        if (typeof data.founderSeatsRemaining === "number") setFounderSeatsRemaining(data.founderSeatsRemaining);
+        if (typeof data.vipSeatsRemaining === "number") setVipSeatsRemaining(data.vipSeatsRemaining);
+      })
+      .catch(() => {});
+  }, []);
+
+  function handleSelect(plan: PricingPlan) {
+    if (plan.fcfa === 0) return;
+    if (plan.id === "vip" && vipSeatsRemaining <= 0) {
+      setShowWaitlist(true);
+      return;
+    }
+    setSelectedPlan(plan);
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
@@ -22,6 +45,14 @@ export default function AbonnementPage() {
           Débloque les fiches d&apos;analyse complètes, l&apos;assistant IA et
           les contenus VIP de Footwik.
         </p>
+
+        {founderSeatsRemaining > 0 && (
+          <div className="mx-auto mt-5 flex max-w-md items-center justify-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-4 py-2 text-sm font-medium text-gold">
+            <Sparkles size={16} />
+            Offre Membre fondateur : plus que {founderSeatsRemaining} place
+            {founderSeatsRemaining !== 1 ? "s" : ""} au forfait Mois à prix bloqué à vie
+          </div>
+        )}
 
         <div className="mt-6 inline-flex items-center gap-1 rounded-full border border-pitch-400 bg-pitch-800 p-1">
           <button
@@ -45,13 +76,15 @@ export default function AbonnementPage() {
         </div>
       </div>
 
-      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {pricingPlans.map((plan) => (
           <PricingCard
             key={plan.id}
             plan={plan}
             region={region}
-            onSelect={(p) => (p.fcfa > 0 ? setSelectedPlan(p) : undefined)}
+            onSelect={handleSelect}
+            founderSeatsRemaining={founderSeatsRemaining}
+            vipSeatsRemaining={vipSeatsRemaining}
           />
         ))}
       </div>
@@ -75,6 +108,7 @@ export default function AbonnementPage() {
           onClose={() => setSelectedPlan(null)}
         />
       )}
+      {showWaitlist && <WaitlistModal onClose={() => setShowWaitlist(false)} />}
     </div>
   );
 }

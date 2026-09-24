@@ -1,14 +1,16 @@
 import Link from "next/link";
-import { ArrowRight, TrendingUp, PlaySquare, Quote } from "lucide-react";
+import { ArrowRight, TrendingUp, PlaySquare, Quote, Sparkles } from "lucide-react";
 import { getUpcomingMatches } from "@/lib/data/matches";
 import { computeStats } from "@/lib/data/history";
 import { testimonials } from "@/lib/data/testimonials";
 import { MatchCard } from "@/components/MatchCard";
 import { formatPercent } from "@/lib/utils";
+import { getFounderSeatsRemaining } from "@/lib/account";
 
-export default function Home() {
+export default async function Home() {
   const upcoming = getUpcomingMatches().slice(0, 6);
   const stats = computeStats();
+  const founderSeatsRemaining = await getFounderSeatsRemaining();
 
   return (
     <div>
@@ -44,6 +46,17 @@ export default function Home() {
           <p className="mt-3 text-xs text-ink-faint">
             Sans engagement · 1 analyse gratuite par jour, aucune carte requise
           </p>
+
+          {founderSeatsRemaining > 0 && (
+            <Link
+              href="/abonnement"
+              className="mx-auto mt-6 flex w-fit items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-4 py-2 text-sm font-medium text-gold hover:bg-gold/20"
+            >
+              <Sparkles size={16} />
+              Offre Membre fondateur : plus que {founderSeatsRemaining} place
+              {founderSeatsRemaining !== 1 ? "s" : ""} à prix bloqué à vie
+            </Link>
+          )}
         </div>
       </section>
 
