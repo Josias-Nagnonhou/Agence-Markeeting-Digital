@@ -7,6 +7,7 @@ export interface CurrentUser {
   email: string | null;
   plan: PlanId;
   isFounder: boolean;
+  isAdmin: boolean;
   planExpiresAt: string | null;
   referralCode: string | null;
   telegramInviteCode: string | null;
@@ -21,7 +22,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("plan, is_founder, plan_expires_at, referral_code, telegram_invite_code")
+      .select("plan, is_founder, is_admin, plan_expires_at, referral_code, telegram_invite_code")
       .eq("id", user.id)
       .maybeSingle();
 
@@ -30,6 +31,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
       email: user.email ?? null,
       plan: (profile?.plan as PlanId) ?? "gratuit",
       isFounder: profile?.is_founder ?? false,
+      isAdmin: profile?.is_admin ?? false,
       planExpiresAt: profile?.plan_expires_at ?? null,
       referralCode: profile?.referral_code ?? null,
       telegramInviteCode: profile?.telegram_invite_code ?? null,

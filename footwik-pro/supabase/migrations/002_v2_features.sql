@@ -14,6 +14,26 @@ alter table public.profiles
   add column if not exists is_founder boolean not null default false,
   add column if not exists telegram_invite_code text;
 
+-- Les admins peuvent lire et modifier tous les profils (gestion des
+-- formules/places fondateur-VIP depuis le panneau d'administration).
+-- Fonction security definer pour éviter toute récursion RLS sur profiles.
+create or replace function public.is_admin(uid uuid)
+returns boolean
+language sql
+security definer
+set search_path = public
+as $$
+  select coalesce((select is_admin from public.profiles where id = uid), false);
+$$;
+
+create policy "Les admins lisent tous les profils"
+  on public.profiles for select
+  using (public.is_admin(auth.uid()));
+
+create policy "Les admins modifient tous les profils"
+  on public.profiles for update
+  using (public.is_admin(auth.uid()));
+
 -- Auto-création du profil à l'inscription (déclencheur sur auth.users)
 create or replace function public.handle_new_user()
 returns trigger
@@ -130,6 +150,8 @@ create table if not exists public.alerts (
 alter table public.alerts enable row level security;
 create policy "Lecture publique des alertes pour les abonnés"
   on public.alerts for select using (auth.uid() is not null);
+create policy "Les admins publient des alertes"
+  on public.alerts for insert with check (public.is_admin(auth.uid()));
 
 create table if not exists public.followed_competitions (
   user_id uuid references public.profiles (id) on delete cascade,
@@ -162,6 +184,12 @@ create index if not exists odds_match_id_idx on public.odds (match_id);
 alter table public.odds enable row level security;
 create policy "Lecture publique des cotes" on public.odds for select using (true);
 
+-- Publication de contenu VIP (audio/vidéo/message) depuis le panneau
+-- d'administration — vip_contents existe depuis schema.sql mais n'avait
+-- pas encore de politique d'écriture.
+create policy "Les admins publient du contenu VIP"
+  on public.vip_contents for insert with check (public.is_admin(auth.uid()));
+
 -- ============================================================
 -- ESPACE VIP
 -- ============================================================
@@ -177,6 +205,8 @@ create table if not exists public.vip_lives (
 alter table public.vip_lives enable row level security;
 create policy "Lecture des lives réservée aux connectés"
   on public.vip_lives for select using (auth.uid() is not null);
+create policy "Les admins publient des lives"
+  on public.vip_lives for insert with check (public.is_admin(auth.uid()));
 
 -- Liste d'attente VIP quand les 200 places sont prises
 create table if not exists public.vip_waitlist (
