@@ -11,6 +11,7 @@ const links = [
   { href: "/coupon", label: "Mon coupon" },
   { href: "/paris", label: "Mes paris" },
   { href: "/alertes", label: "Alertes" },
+  { href: "/vip", label: "VIP" },
   { href: "/abonnement", label: "Abonnement" },
   { href: "/assistant", label: "Assistant IA" },
 ];
