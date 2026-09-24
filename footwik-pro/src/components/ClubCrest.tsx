@@ -1,16 +1,10 @@
-import { useId } from "react";
+"use client";
+
+import { useId, useState } from "react";
 import { Team } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-export function ClubCrest({
-  team,
-  size = 40,
-  className,
-}: {
-  team: Team;
-  size?: number;
-  className?: string;
-}) {
+function CrestBadge({ team, size, className }: { team: Team; size: number; className?: string }) {
   const gradientId = useId();
   const textColor = team.lightText ? "#FFFFFF" : "#0A0E0B";
   const code = team.shortName.replace(/[^A-Za-zÀ-ÿ]/g, "").slice(0, 4).toUpperCase() || team.logo;
@@ -57,4 +51,33 @@ export function ClubCrest({
       </text>
     </svg>
   );
+}
+
+export function ClubCrest({
+  team,
+  size = 40,
+  className,
+}: {
+  team: Team;
+  size?: number;
+  className?: string;
+}) {
+  const [imageFailed, setImageFailed] = useState(false);
+
+  if (team.logoUrl && !imageFailed) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={team.logoUrl}
+        alt={`Logo ${team.name}`}
+        width={size}
+        height={size}
+        className={cn("shrink-0 object-contain drop-shadow-sm", className)}
+        style={{ width: size, height: size }}
+        onError={() => setImageFailed(true)}
+      />
+    );
+  }
+
+  return <CrestBadge team={team} size={size} className={className} />;
 }

@@ -25,6 +25,7 @@ export interface Team {
   primaryColor: string;
   accentColor: string;
   lightText: boolean;
+  logoUrl?: string;
 }
 
 export interface FormResult {

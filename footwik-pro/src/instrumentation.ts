@@ -10,36 +10,30 @@ export async function register() {
 
   const { searchTeam } = await import("@/lib/football/apiFootball");
 
-  const queries = [
-    "Paris Saint Germain",
-    "RC Lens",
-    "Real Madrid",
-    "Barcelona",
-    "Manchester City",
-    "Arsenal",
-    "Inter",
-    "AC Milan",
-    "Bayern Munich",
-    "Borussia Dortmund",
-    "Senegal",
-    "Ivory Coast",
-    "Cameroon",
-    "Benin",
-    "ASEC Mimosas",
-    "Africa Sports",
-    "Jaraaf",
-    "Casa Sports",
-    "Coton Sport",
-    "Buffles du Borgou",
+  const queries: { q: string; country?: string }[] = [
+    { q: "Lens", country: "France" },
+    { q: "Inter", country: "Italy" },
+    { q: "Bayern", country: "Germany" },
+    { q: "Senegal" },
+    { q: "Ivory Coast" },
+    { q: "Cameroon" },
+    { q: "Benin" },
+    { q: "ASEC Mimosas" },
+    { q: "Africa Sports" },
+    { q: "Jaraaf" },
+    { q: "Casa Sports" },
+    { q: "Coton Sport" },
+    { q: "Buffles du Borgou" },
   ];
 
   const results: Record<string, unknown> = {};
-  for (const q of queries) {
+  for (const { q, country } of queries) {
     try {
-      results[q] = await searchTeam(q);
+      results[q] = await searchTeam(q, { country });
     } catch (err) {
       results[q] = { error: err instanceof Error ? err.message : "lookup failed" };
     }
+    await new Promise((r) => setTimeout(r, 7000));
   }
 
   console.log("TEAM_LOOKUP_RESULT_START");
