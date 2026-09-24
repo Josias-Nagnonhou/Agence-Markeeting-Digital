@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #04210f;
+  --foreground: #f1f5ef;
+}
+
+* {
+  border-color: #26302a;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--foreground);
+  background-color: #0a0e0b;
+  background-image: radial-gradient(120% 60% at 50% -10%, #16301f 0%, #04210f 45%, #0a0e0b 100%);
+  background-attachment: fixed;
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .font-display {
+    font-family: var(--font-display), "Arial Narrow", sans-serif;
+    letter-spacing: 0.01em;
+  }
+  .blur-premium {
+    filter: blur(6px);
+    user-select: none;
+    pointer-events: none;
+  }
+  .card-surface {
+    background-color: #121813;
+    border: 1px solid #26302a;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #26302a;
+    border-radius: 999px;
+  }
+}
