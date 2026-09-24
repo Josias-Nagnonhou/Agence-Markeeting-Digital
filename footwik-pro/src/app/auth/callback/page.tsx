@@ -7,12 +7,17 @@ import { createClient } from "@/lib/supabase/client";
 export default function AuthCallbackPage() {
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("Connexion en cours...");
+  const [retryHref, setRetryHref] = useState("/connexion");
 
   useEffect(() => {
     async function run() {
       const params = new URLSearchParams(window.location.search);
       const code = params.get("code");
       const errorDescription = params.get("error_description");
+      const rawNext = params.get("next");
+      const next = rawNext && rawNext.startsWith("/") ? rawNext : "/compte";
+
+      setRetryHref(`/connexion?next=${encodeURIComponent(next)}`);
 
       if (errorDescription) {
         setStatus("error");
@@ -32,7 +37,7 @@ export default function AuthCallbackPage() {
         if (error) throw error;
         setStatus("success");
         setMessage("Connexion réussie, redirection...");
-        window.location.replace("/compte");
+        window.location.replace(next);
       } catch (e) {
         setStatus("error");
         setMessage(
@@ -51,7 +56,7 @@ export default function AuthCallbackPage() {
       <p className="mt-4 text-sm text-ink-muted">{message}</p>
       {status === "error" && (
         <a
-          href="/connexion"
+          href={retryHref}
           className="mt-5 rounded-lg bg-grass px-5 py-2.5 text-sm font-semibold text-pitch-950 hover:bg-grass-light"
         >
           Réessayer la connexion

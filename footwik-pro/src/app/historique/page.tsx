@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { HistoryExplorer } from "@/components/HistoryExplorer";
 import {
   predictionHistory,
@@ -8,12 +9,25 @@ import {
 } from "@/lib/data/history";
 import { RateBar } from "@/components/RateBar";
 import { formatPercent } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata = {
   title: "Historique public des pronostics — Footwik Pro",
 };
 
-export default function HistoriquePage() {
+export default async function HistoriquePage() {
+  let hasUser = false;
+  try {
+    const supabase = createClient();
+    const { data } = await supabase.auth.getUser();
+    hasUser = !!data.user;
+  } catch {
+    hasUser = false;
+  }
+  if (!hasUser) {
+    redirect("/connexion?next=/historique");
+  }
+
   const stats = computeStats();
   const byConfidence = computeStatsByConfidence();
   const byCompetition = computeStatsByCompetition();

@@ -8,7 +8,13 @@ import { createClient } from "@/lib/supabase/client";
 type Channel = "email" | "phone";
 type Step = "identifiant" | "code";
 
-export function AuthForm({ mode }: { mode: "connexion" | "inscription" }) {
+export function AuthForm({
+  mode,
+  next = "/compte",
+}: {
+  mode: "connexion" | "inscription";
+  next?: string;
+}) {
   const [channel, setChannel] = useState<Channel>("email");
   const [step, setStep] = useState<Step>("identifiant");
   const [identifier, setIdentifier] = useState("");
@@ -38,7 +44,9 @@ export function AuthForm({ mode }: { mode: "connexion" | "inscription" }) {
         channel === "email"
           ? await supabase.auth.signInWithOtp({
               email: identifier,
-              options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+              options: {
+                emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+              },
             })
           : await supabase.auth.signInWithOtp({ phone: identifier });
 
@@ -71,7 +79,7 @@ export function AuthForm({ mode }: { mode: "connexion" | "inscription" }) {
           : { phone: identifier, token: code, type: "sms" },
       );
       if (verifyError) throw verifyError;
-      window.location.href = "/compte";
+      window.location.href = next;
     } catch (e) {
       setError(
         e instanceof Error ? e.message : "Code invalide ou expiré.",
@@ -195,9 +203,9 @@ export function AuthForm({ mode }: { mode: "connexion" | "inscription" }) {
 
       <p className="mt-6 text-center text-xs text-ink-faint">
         {mode === "connexion" ? (
-          <>Pas encore de compte ? <a href="/inscription" className="text-grass hover:underline">Inscrivez-vous</a></>
+          <>Pas encore de compte ? <a href={`/inscription?next=${encodeURIComponent(next)}`} className="text-grass hover:underline">Inscrivez-vous</a></>
         ) : (
-          <>Déjà abonné ? <a href="/connexion" className="text-grass hover:underline">Connectez-vous</a></>
+          <>Déjà abonné ? <a href={`/connexion?next=${encodeURIComponent(next)}`} className="text-grass hover:underline">Connectez-vous</a></>
         )}
       </p>
     </div>
