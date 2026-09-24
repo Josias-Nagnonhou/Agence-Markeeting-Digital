@@ -28,19 +28,22 @@ export default function Home() {
             tout, même nos pronostics perdus.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
-              href="/abonnement"
+            <a
+              href="#matchs-du-jour"
               className="flex items-center gap-2 rounded-lg bg-grass px-6 py-3 font-semibold text-pitch-950 transition hover:bg-grass-light"
             >
-              S&apos;abonner maintenant <ArrowRight size={18} />
-            </Link>
+              Commencer gratuitement <ArrowRight size={18} />
+            </a>
             <Link
-              href="/historique"
+              href="/abonnement"
               className="rounded-lg border border-pitch-400 px-6 py-3 font-semibold text-ink transition hover:bg-pitch-600"
             >
-              Voir notre historique public
+              Voir les abonnements
             </Link>
           </div>
+          <p className="mt-3 text-xs text-ink-faint">
+            Sans engagement · 1 analyse gratuite par jour, aucune carte requise
+          </p>
         </div>
       </section>
 
@@ -69,7 +72,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="px-4 py-14">
+      <section id="matchs-du-jour" className="scroll-mt-20 px-4 py-14">
         <div className="mx-auto max-w-6xl">
           <div className="flex items-end justify-between gap-4">
             <h2 className="font-display text-2xl font-bold uppercase text-ink sm:text-3xl">
