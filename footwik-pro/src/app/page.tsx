@@ -121,7 +121,7 @@ export default function Home() {
           </div>
           <div className="flex-1">
             <h3 className="font-display text-xl font-bold uppercase text-ink">
-              La chaîne YouTube Footwik, 60 000 abonnés
+              La chaîne YouTube Footwik
             </h3>
             <p className="mt-1 text-sm text-ink-faint">
               Retrouvez nos décryptages vidéo, nos débats et nos analyses en
@@ -129,7 +129,7 @@ export default function Home() {
             </p>
           </div>
           <a
-            href="https://youtube.com"
+            href="https://www.youtube.com/@Footwik"
             target="_blank"
             rel="noreferrer"
             className="shrink-0 rounded-lg bg-gold px-5 py-2.5 font-semibold text-pitch-950 hover:bg-gold/90"

@@ -16,7 +16,7 @@ export function Footer() {
             </p>
             <div className="mt-4 flex gap-3">
               <a
-                href="https://youtube.com"
+                href="https://www.youtube.com/@Footwik"
                 target="_blank"
                 rel="noreferrer"
                 className="flex h-9 w-9 items-center justify-center rounded-full border border-pitch-400 text-ink-muted hover:border-grass hover:text-grass"
@@ -58,11 +58,11 @@ export function Footer() {
           <div>
             <div className="text-sm font-semibold text-ink">Footwik sur YouTube</div>
             <p className="mt-3 text-sm text-ink-faint">
-              Plus de 60 000 abonnés suivent nos décryptages de matchs chaque
-              semaine.
+              Retrouvez nos décryptages de matchs chaque semaine sur la
+              chaîne YouTube Footwik.
             </p>
             <a
-              href="https://youtube.com"
+              href="https://www.youtube.com/@Footwik"
               target="_blank"
               rel="noreferrer"
               className="mt-3 inline-block rounded-lg border border-gold/40 bg-gold/10 px-3 py-1.5 text-sm font-medium text-gold hover:bg-gold/20"
