@@ -33,6 +33,15 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
+-- Favoris et équipes suivies référencent les identifiants texte des
+-- données mock (ex: "psg-lens", "senegal") tant que la synchronisation
+-- API-Football réelle n'alimente pas les tables matches/teams.
+alter table public.favorites drop constraint if exists favorites_match_id_fkey;
+alter table public.favorites alter column match_id type text using match_id::text;
+
+alter table public.followed_teams drop constraint if exists followed_teams_team_id_fkey;
+alter table public.followed_teams alter column team_id type text using team_id::text;
+
 -- ============================================================
 -- JOURNAL D'ACTIVITÉ (historique visible dans l'espace abonné)
 -- ============================================================

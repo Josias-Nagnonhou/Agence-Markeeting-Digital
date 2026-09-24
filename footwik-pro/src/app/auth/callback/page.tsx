@@ -35,6 +35,11 @@ export default function AuthCallbackPage() {
         const supabase = createClient();
         const { error } = await supabase.auth.exchangeCodeForSession(code);
         if (error) throw error;
+        fetch("/api/activity/log", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ activityType: "connexion", label: "Connexion (lien email)" }),
+        }).catch(() => {});
         setStatus("success");
         setMessage("Connexion réussie, redirection...");
         window.location.replace(next);

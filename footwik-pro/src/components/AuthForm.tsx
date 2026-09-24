@@ -71,6 +71,14 @@ export function AuthForm({
         type: "email",
       });
       if (verifyError) throw verifyError;
+      fetch("/api/activity/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          activityType: mode === "inscription" ? "inscription" : "connexion",
+          label: mode === "inscription" ? "Compte créé" : "Connexion (code)",
+        }),
+      }).catch(() => {});
       window.location.href = next;
     } catch (e) {
       setError(

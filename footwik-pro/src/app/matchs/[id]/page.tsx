@@ -11,6 +11,7 @@ import { ClubCrest } from "@/components/ClubCrest";
 import { getCurrentUser } from "@/lib/account";
 import { hasFeature } from "@/lib/entitlements";
 import { createClient } from "@/lib/supabase/server";
+import { FavoriteButton } from "@/components/FavoriteButton";
 
 // Rendu dynamique obligatoire : la fiche dépend de l'abonnement de
 // l'utilisateur connecté (verrouillage par formule) et journalise sa
@@ -25,6 +26,8 @@ export default async function MatchPage({ params }: { params: { id: string } }) 
   const plan = user?.plan ?? "gratuit";
   const locked = !match.isFree && !hasFeature(plan, "full_analyses");
 
+  let isFavorited = false;
+
   if (user) {
     try {
       const supabase = createClient();
@@ -34,6 +37,13 @@ export default async function MatchPage({ params }: { params: { id: string } }) 
         label: `Consultation : ${match.home.shortName} vs ${match.away.shortName}`,
         metadata: { matchId: match.id },
       });
+      const { data: favorite } = await supabase
+        .from("favorites")
+        .select("match_id")
+        .eq("user_id", user.id)
+        .eq("match_id", match.id)
+        .maybeSingle();
+      isFavorited = !!favorite;
     } catch {
       // best-effort, ne bloque jamais l'affichage de la fiche
     }
@@ -89,6 +99,9 @@ export default async function MatchPage({ params }: { params: { id: string } }) 
         <div className="mt-5 flex items-center justify-center gap-2">
           <span className="text-sm text-ink-faint">Indice de confiance :</span>
           <ConfidenceStars confidence={match.confidence} size={18} />
+        </div>
+        <div className="mt-4 flex justify-center">
+          <FavoriteButton matchId={match.id} initialFavorited={isFavorited} isLoggedIn={!!user} />
         </div>
       </div>
 
