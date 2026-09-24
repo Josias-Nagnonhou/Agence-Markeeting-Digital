@@ -9,6 +9,7 @@ const links = [
   { href: "/", label: "Accueil" },
   { href: "/historique", label: "Historique" },
   { href: "/coupon", label: "Mon coupon" },
+  { href: "/paris", label: "Mes paris" },
   { href: "/abonnement", label: "Abonnement" },
   { href: "/assistant", label: "Assistant IA" },
 ];
