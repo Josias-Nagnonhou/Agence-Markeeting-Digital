@@ -12,6 +12,7 @@ import { getCurrentUser } from "@/lib/account";
 import { hasFeature } from "@/lib/entitlements";
 import { createClient } from "@/lib/supabase/server";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { OddsComparator } from "@/components/OddsComparator";
 
 // Rendu dynamique obligatoire : la fiche dépend de l'abonnement de
 // l'utilisateur connecté (verrouillage par formule) et journalise sa
@@ -27,6 +28,18 @@ export default async function MatchPage({ params }: { params: { id: string } }) 
   const locked = !match.isFree && !hasFeature(plan, "full_analyses");
 
   let isFavorited = false;
+  let odds: { bookmaker: string; market: string; pick: string; odd: number }[] = [];
+
+  try {
+    const supabase = createClient();
+    const { data } = await supabase
+      .from("odds")
+      .select("bookmaker, market, pick, odd")
+      .eq("match_id", match.id);
+    odds = data ?? [];
+  } catch {
+    // pas grave : la section cotes affichera "non disponibles"
+  }
 
   if (user) {
     try {
@@ -143,6 +156,12 @@ export default async function MatchPage({ params }: { params: { id: string } }) 
         ) : (
           <FicheDetails match={match} />
         )}
+
+        <Section icon={Target} title="Cotes">
+          <FeatureGate feature="odds_comparator" plan={plan}>
+            <OddsComparator odds={odds} />
+          </FeatureGate>
+        </Section>
       </div>
     </div>
   );
