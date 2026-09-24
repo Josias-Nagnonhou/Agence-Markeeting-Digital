@@ -36,14 +36,17 @@ export function AuthForm({ mode }: { mode: "connexion" | "inscription" }) {
       const supabase = createClient();
       const { error: otpError } =
         channel === "email"
-          ? await supabase.auth.signInWithOtp({ email: identifier })
+          ? await supabase.auth.signInWithOtp({
+              email: identifier,
+              options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+            })
           : await supabase.auth.signInWithOtp({ phone: identifier });
 
       if (otpError) throw otpError;
       setStep("code");
       setInfo(
         channel === "email"
-          ? "Un code de vérification vient de vous être envoyé par email."
+          ? "Vérifiez votre boîte mail : cliquez sur le lien reçu (ou saisissez le code s'il en contient un)."
           : "Un code de vérification vient de vous être envoyé par SMS.",
       );
     } catch (e) {
@@ -156,10 +159,18 @@ export function AuthForm({ mode }: { mode: "connexion" | "inscription" }) {
       ) : (
         <>
           {info && <p className="mt-5 text-sm text-grass">{info}</p>}
+          {channel === "email" && (
+            <p className="mt-2 text-xs text-ink-faint">
+              Le plus simple : ouvrez l&apos;email reçu et cliquez sur le
+              lien de connexion, cet écran se mettra à jour automatiquement.
+              Si votre email contient plutôt un code, saisissez-le
+              ci-dessous.
+            </p>
+          )}
           <input
             type="text"
             inputMode="numeric"
-            placeholder="Code à 6 chiffres"
+            placeholder="Code à 6 chiffres (optionnel si vous cliquez le lien)"
             value={code}
             onChange={(e) => setCode(e.target.value)}
             className="mt-3 w-full rounded-lg border border-pitch-400 bg-pitch-600/40 px-3 py-2.5 text-center text-lg tracking-[0.5em] text-ink placeholder:tracking-normal placeholder:text-ink-faint"
@@ -171,7 +182,7 @@ export function AuthForm({ mode }: { mode: "connexion" | "inscription" }) {
             className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-grass px-4 py-2.5 text-sm font-semibold text-pitch-950 hover:bg-grass-light disabled:opacity-50"
           >
             {loading && <Loader2 size={16} className="animate-spin" />}
-            Valider et continuer
+            Valider le code
           </button>
           <button
             onClick={() => setStep("identifiant")}
