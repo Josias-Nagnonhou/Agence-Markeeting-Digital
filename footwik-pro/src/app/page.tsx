@@ -6,6 +6,7 @@ import { testimonials } from "@/lib/data/testimonials";
 import { MatchCard } from "@/components/MatchCard";
 import { formatPercent } from "@/lib/utils";
 import { getFounderSeatsRemaining } from "@/lib/account";
+import { RollingBall } from "@/components/RollingBall";
 
 export default async function Home() {
   const upcoming = getUpcomingMatches().slice(0, 6);
@@ -14,22 +15,33 @@ export default async function Home() {
 
   return (
     <div>
-      <section className="border-b border-pitch-600 px-4 py-16 text-center sm:py-24">
-        <div className="mx-auto max-w-3xl">
-          <span className="inline-block rounded-full border border-grass/30 bg-grass/10 px-4 py-1.5 text-xs font-medium text-grass">
+      <section className="relative overflow-hidden border-b border-pitch-600 px-4 py-16 text-center sm:py-24">
+        <RollingBall className="top-20 sm:top-28" style={{ animationDelay: "0s" }} />
+        <RollingBall className="top-40 sm:top-56" style={{ animationDelay: "4.5s" }} />
+        <div className="relative mx-auto max-w-3xl">
+          <span className="animate-fade-up inline-block rounded-full border border-grass/30 bg-grass/10 px-4 py-1.5 text-xs font-medium text-grass">
             Analyse IA · Transparence totale · Football francophone
           </span>
-          <h1 className="mt-6 font-display text-4xl font-black uppercase leading-[1.05] text-ink sm:text-6xl">
+          <h1
+            className="animate-fade-up mt-6 font-display text-4xl font-black uppercase leading-[1.05] text-ink sm:text-6xl"
+            style={{ animationDelay: "0.08s" }}
+          >
             Comprends chaque match
             <br />
             <span className="text-grass">mieux que tout le monde</span>
           </h1>
-          <p className="mx-auto mt-5 max-w-xl text-base text-ink-muted sm:text-lg">
+          <p
+            className="animate-fade-up mx-auto mt-5 max-w-xl text-base text-ink-muted sm:text-lg"
+            style={{ animationDelay: "0.16s" }}
+          >
             Footwik Pro analyse chaque match par intelligence artificielle :
             forme, statistiques avancées, facteurs cachés. Et on affiche
             tout, même nos pronostics perdus.
           </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <div
+            className="animate-fade-up mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
+            style={{ animationDelay: "0.24s" }}
+          >
             <a
               href="#matchs-du-jour"
               className="flex items-center gap-2 rounded-lg bg-grass px-6 py-3 font-semibold text-pitch-950 transition hover:bg-grass-light"
